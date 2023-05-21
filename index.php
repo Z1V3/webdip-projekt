@@ -32,7 +32,7 @@
         <div class="top">
             <div class="row large light-grey">
                 <div class="col s3">
-                    <a href="#" class="button block">Popis zahtjeva</a>
+                    <a href="index.php" class="button block">Popis zahtjeva</a>
                 </div>
                 <div class="col s3">
                     <a href="#plans" class="button block">O autoru</a>
@@ -53,7 +53,7 @@
                     <a href="#contact" class="button block">Prijavi vlasništvo</a>
                 </div>
                 <div class="col s3">
-                    <a href="#contact" class="button block">Prijava / Registracija</a>
+                    <a href="forms/authentication-login.php" class="button block">Prijava / Registracija</a>
                 </div>
             </div>
         </div>
