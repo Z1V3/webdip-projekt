@@ -1,8 +1,16 @@
+<?php
+$putanja = dirname($_SERVER['REQUEST_URI']);
 
+if($putanja == "/azivko"){
+    $putanja = "/azivko/webdip_projekt";
+}
+require "php/functions.php";
+
+?>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>W3.CSS Template</title>
+        <title>Intelektualno vlasnistvo</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/content.css">
@@ -29,34 +37,9 @@
     <body>
 
         <!-- Menu -->
-        <div class="top">
-            <div class="row large light-grey">
-                <div class="col s3">
-                    <a href="index.php" class="button block">Popis zahtjeva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#plans" class="button block">O autoru</a>
-                </div>
-                <div class="col s3">
-                    <a href="#about" class="button block">Kreiraj zahtjev</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Moja vlasništva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Popis vlasnika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Statistika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Prijavi vlasništvo</a>
-                </div>
-                <div class="col s3">
-                    <a href="forms/authentication-login.php" class="button block">Prijava / Registracija</a>
-                </div>
-            </div>
-        </div>
+        <?php
+        include "php/meni.php";
+        ?>
 
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
