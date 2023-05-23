@@ -1,8 +1,61 @@
+<?php
+$putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
+include "../php/functions.php";
+
+if (isset($_SESSION["uloga"])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+if (isset($_POST["submit"])) {
+    $error = "";
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    if (!isset($_POST["username"]) || !isset($_POST["password"])) {
+        $error = "Niste unijeli sve podatke!";
+    } else {
+        $veza = new Baza();
+        $veza->spojiDB();
+
+        $upit = "SELECT * FROM `korisnik` WHERE "
+                . "`korisnicko_ime`='{$username}' AND "
+                . "`lozinka`='{$password}' AND "
+                . "`tip_korisnika_id` NOT LIKE '1'";
+        $rezultat = $veza->selectDB($upit);
+
+        $autenticiran = false;
+        while ($red = mysqli_fetch_array($rezultat)) {
+            if ($red) {
+                $autenticiran = true;
+                $tip = $red["tip_korisnika_id"];
+                $email = $red["email"];
+            }
+        }
+
+        if ($autenticiran) {
+            $poruka = 'Uspješna prijava!';
+
+            //Create cookie
+            setcookie("autenticiran", $username, false, '/', false);
+
+            //Create session
+            Sesija::kreirajKorisnika($username, $tip);
+
+            header("Location: ../index.php");
+            exit();
+        } else {
+            $poruka = 'Neuspješna prijava!';
+        }
+
+        $veza->zatvoriDB();
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>W3.CSS Template</title>
+        <title>Intelektualno vlasnistvo</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="../css/content.css">
@@ -26,7 +79,7 @@
             }
 
 
-            
+
             *:after{
                 padding: 0;
                 margin: 0;
@@ -55,7 +108,7 @@
                     #23a2f6
                     );
                 left: -80px;
-                top: -80px;
+                top: -50px;
             }
             .shape:last-child{
                 background: linear-gradient(
@@ -63,16 +116,16 @@
                     #ff512f,
                     #f09819
                     );
-                right: -30px;
-                bottom: -80px;
+                right: -80px;
+                bottom: -130px;
             }
             form{
-                height: 520px;
+                height: 570px;
                 width: 400px;
                 background-color: rgba(255,255,255,0.13);
                 position: absolute;
                 transform: translate(-50%,-50%);
-                top: 50%;
+                top: 55%;
                 left: 50%;
                 border-radius: 10px;
                 border: 2px solid rgba(255,255,255,0.1);
@@ -132,34 +185,9 @@
     <body>
 
         <!-- Menu -->
-        <div class="top">
-            <div class="row large light-grey">
-                <div class="col s3">
-                    <a href="../index.php" class="button block">Popis zahtjeva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#plans" class="button block">O autoru</a>
-                </div>
-                <div class="col s3">
-                    <a href="#about" class="button block">Kreiraj zahtjev</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Moja vlasništva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Popis vlasnika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Statistika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Prijavi vlasništvo</a>
-                </div>
-                <div class="col s3">
-                    <a href="authentication.php" class="button block">Prijava / Registracija</a>
-                </div>
-            </div>
-        </div>
+        <?php
+        include "../php/meni.php";
+        ?>
 
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
@@ -171,17 +199,19 @@
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form>
-                    <h3>Login Here</h3>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
+                    <h3>Login</h3>
 
                     <label for="username">Username</label>
-                    <input type="text" placeholder="Email or Phone" id="username">
+                    <input type="text" placeholder="Username" id="username" name="username">
 
                     <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
+                    <input type="password" placeholder="Password" id="password" name="password">
 
-                    <button>Prijavi se</button><br><br>
-                    
+                    <button name="submit">Prijavi se</button><br><br>
+
+                    <p><?php echo $poruka; ?></p>
+
                     <a href="authentication-register.php">Registriraj se</a>
                 </form>
 

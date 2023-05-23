@@ -2,45 +2,35 @@
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
+if(!isset($_SESSION["uloga"])){
+    
+        $kod = rand(100000, 999999);
+        
+        if(isset($_GET["kod"])){
+            global $kod;
+            $kod = $_GET["kod"];
+        }
+        
+        $mail_to = 'andrijazifko@gmail.com';
+        $mail_from = "qick319@gmail.com";
+        $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
+        $mail_body = "Kod za aktivaciju racuna je: {$kod}";
 
-if (isset($_SESSION["uloga"])) {
-    header("Location: ../index.php");
-    exit();
+        if (mail($mail_to, $mail_subject, $mail_body, $mail_from)) {
+            echo("Poslana poruka za: '$mail_to'!");
+        } else {
+            echo("Problem kod poruke za: '$mail_to'!");
+        }
 }
 
 if (isset($_POST["submit"])) {
-    $error = "";
-    $username = $_POST["username"];
-    $firstname = $_POST["firstname"];
-    $lastname = $_POST["lastname"];
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $confirmPassword = $_POST["confirm_password"];
+    if ($_POST["activation_code"] == $kod) {
 
-    $regex = "/^[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+[\w]+@+[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+$/";
-    if (!preg_match($regex, $email)) {
-        $error .= "Email polje nije pravilno popunjeno!";
-    }
+        setcookie("autenticiran", $_GET["username"], false, '/', false);
 
-    $regex = '/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?/~_+\-=|\]).{8,32}$/';
-    if (!preg_match($regex, $password)) {
-        $error .= "Lozinka mora sadržavati barem jedan broj, jedno veliko i jedno malo slovo te specijalan znak i u rangu je od 8 do 32 znakova!";
-    }
+        Sesija::kreirajKorisnika($_GET["username"], 2);
 
-    if (empty($greska)) {
-
-        $veza = new Baza();
-        $veza->spojiDB();
-
-        $password_sha256 = hash("sha256", $password);
-
-        $query = "INSERT INTO korisnik (korisnicko_ime, ime, prezime, email, lozinka, lozinka_sha256, uvjeti, broj_neuspjesnih_prijava, blokiran, tip_korisnika_id) VALUES ('{$username}','{$firstname}','{$lastname}','{$email}','{$password}','{$password_sha256}','0','0','0','2')";
-
-        $result = $veza->selectDB($query);
-
-        $veza->zatvoriDB();
-
-        header("Location: account-activation.php?username={$username}");
+        header("Location: ../index.php");
         exit();
     }
 }
@@ -192,29 +182,15 @@ if (isset($_POST["submit"])) {
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>?kod=<?php echo $kod;?>" novalidate>
                     <h3>Registracija</h3>
 
-                    <label for="username">Username</label>
-                    <input type="text" placeholder="Email or Phone" id="username" name="username">
+                    <p>Poslali smo vam kod za aktivaciju registracije na e-mail.</p>
+                    <label for="activation_code">Upišite kod kako biste aktivirali svoj račun</label>
+                    <input type="text" placeholder="Enter here" id="activation_code" name="activation_code">
 
-                    <label for="firstname">Firstname</label>
-                    <input type="text" placeholder="Firstname" id="firstname" name="firstname">
-
-                    <label for="lastname">Lastname</label>
-                    <input type="text" placeholder="Lastname" id="lastname" name="lastname">
-
-                    <label for="email">Email</label>
-                    <input type="email" placeholder="Email" id="email" name="email">
-
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password" name="password">
-
-                    <label for="confirm_password">Confirm password</label>
-                    <input type="password" placeholder="Confirm password" id="confirm_password" name="confirm_password">
-
-                    <button name="submit">Registriraj se</button><br><br>
-
+                    <button name="submit">Potvrdi aktivaciju</button><br><br>
+                    
                     <a href="authentication-login.php">Logiraj se</a>
                 </form>
 
