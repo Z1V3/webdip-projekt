@@ -1,50 +1,36 @@
 <?php
-
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
+if(!isset($_SESSION["uloga"])){
+    
+        $kod = rand(100000, 999999);
+        
+        if(isset($_GET["kod"])){
+            global $kod;
+            $kod = $_GET["kod"];
+        }
+        
+        $mail_to = 'andrijazifko@gmail.com';
+        $mail_from = "qick319@gmail.com";
+        $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
+        $mail_body = "Kod za aktivaciju racuna je: {$kod}";
+
+        if (mail($mail_to, $mail_subject, $mail_body, $mail_from)) {
+            echo("Poslana poruka za: '$mail_to'!");
+        } else {
+            echo("Problem kod poruke za: '$mail_to'!");
+        }
+}
 
 if (isset($_POST["submit"])) {
-    $error = "";
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    if (!isset($_POST["username"]) || !isset($_POST["password"])) {
-        $error = "Niste unijeli sve podatke!";
-    } else {
-        $veza = new Baza();
-        $veza->spojiDB();
+    if ($_POST["activation_code"] == $kod) {
 
-        $upit = "SELECT * FROM `korisnik` WHERE "
-                . "`korisnicko_ime`='{$username}' AND "
-                . "`lozinka`='{$password}' AND "
-                . "`tip_korisnika_id` NOT LIKE '1'";
-        $rezultat = $veza->selectDB($upit);
+        setcookie("autenticiran", $_GET["username"], false, '/', false);
 
-        $autenticiran = false;
-        while ($red = mysqli_fetch_array($rezultat)) {
-            if ($red) {
-                $autenticiran = true;
-                $tip = $red["tip_korisnika_id"];
-                $email = $red["email"];
-            }
-        }
+        Sesija::kreirajKorisnika($_GET["username"], 2);
 
-        if ($autenticiran) {
-            $poruka = 'Uspješna prijava!';
-
-            //Create cookie
-            setcookie("autenticiran", $username, false, '/', false);
-
-            //Create session
-            Sesija::kreirajKorisnika($username, $tip);
-
-            header("Location: ../index.php");
-            exit();
-        } else {
-            $poruka = 'Neuspješna prijava!';
-        }
-
-        $veza->zatvoriDB();
+        header("Location: ../index.php");
     }
 }
 ?>
@@ -103,8 +89,8 @@ if (isset($_POST["submit"])) {
                     #1845ad,
                     #23a2f6
                     );
-                left: -80px;
-                top: -50px;
+                left: -200px;
+                top: -100px;
             }
             .shape:last-child{
                 background: linear-gradient(
@@ -112,16 +98,16 @@ if (isset($_POST["submit"])) {
                     #ff512f,
                     #f09819
                     );
-                right: -80px;
-                bottom: -130px;
+                right: -130px;
+                bottom: -500px;
             }
             form{
-                height: 570px;
-                width: 400px;
+                height: 970px;
+                width: 600px;
                 background-color: rgba(255,255,255,0.13);
                 position: absolute;
                 transform: translate(-50%,-50%);
-                top: 55%;
+                top: 66%;
                 left: 50%;
                 border-radius: 10px;
                 border: 2px solid rgba(255,255,255,0.1);
@@ -195,20 +181,16 @@ if (isset($_POST["submit"])) {
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"];?>" novalidate>
-                    <h3>Login</h3>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>?kod=<?php echo $kod;?>" novalidate>
+                    <h3>Registracija</h3>
 
-                    <label for="username">Username</label>
-                    <input type="text" placeholder="Username" id="username" name="username">
+                    <p>Poslali smo vam kod za aktivaciju registracije na e-mail.</p>
+                    <label for="activation_code">Upišite kod kako biste aktivirali svoj račun</label>
+                    <input type="text" placeholder="Enter here" id="activation_code" name="activation_code">
 
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password" name="password">
-
-                    <button name="submit">Prijavi se</button><br><br>
-
-                    <p><?php echo $poruka;?></p>
-
-                    <a href="authentication-register.php">Registriraj se</a>
+                    <button name="submit">Potvrdi aktivaciju</button><br><br>
+                    
+                    <a href="authentication-login.php">Logiraj se</a>
                 </form>
 
             </div>
