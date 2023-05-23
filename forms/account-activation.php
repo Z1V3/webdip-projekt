@@ -31,6 +31,7 @@ if (isset($_POST["submit"])) {
         Sesija::kreirajKorisnika($_GET["username"], 2);
 
         header("Location: ../index.php");
+        exit();
     }
 }
 ?>

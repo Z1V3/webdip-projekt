@@ -3,6 +3,11 @@ $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
 
+if (isset($_SESSION["uloga"])) {
+    header("Location: ../index.php");
+    exit();
+}
+
 if (isset($_POST["submit"])) {
     $error = "";
     $username = $_POST["username"];
@@ -36,6 +41,7 @@ if (isset($_POST["submit"])) {
         $veza->zatvoriDB();
 
         header("Location: account-activation.php?username={$username}");
+        exit();
     }
 }
 ?>
@@ -172,9 +178,9 @@ if (isset($_POST["submit"])) {
     <body>
 
         <!-- Menu -->
-<?php
-include "../php/meni.php";
-?>
+        <?php
+        include "../php/meni.php";
+        ?>
 
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">

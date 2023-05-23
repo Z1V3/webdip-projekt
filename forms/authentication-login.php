@@ -1,8 +1,12 @@
 <?php
-
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
+
+if (isset($_SESSION["uloga"])) {
+    header("Location: ../index.php");
+    exit();
+}
 
 if (isset($_POST["submit"])) {
     $error = "";
@@ -195,7 +199,7 @@ if (isset($_POST["submit"])) {
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"];?>" novalidate>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
                     <h3>Login</h3>
 
                     <label for="username">Username</label>
@@ -206,7 +210,7 @@ if (isset($_POST["submit"])) {
 
                     <button name="submit">Prijavi se</button><br><br>
 
-                    <p><?php echo $poruka;?></p>
+                    <p><?php echo $poruka; ?></p>
 
                     <a href="authentication-register.php">Registriraj se</a>
                 </form>
