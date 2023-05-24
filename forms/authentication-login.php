@@ -10,6 +10,7 @@ if (isset($_SESSION["uloga"])) {
 
 if (isset($_POST["submit"])) {
     $error = "";
+    $aktiviran;
     $username = $_POST["username"];
     $password = $_POST["password"];
     if (!isset($_POST["username"]) || !isset($_POST["password"])) {
@@ -30,10 +31,11 @@ if (isset($_POST["submit"])) {
                 $autenticiran = true;
                 $tip = $red["tip_korisnika_id"];
                 $email = $red["email"];
+                $aktiviran = $red["aktiviran"];
             }
         }
 
-        if ($autenticiran) {
+        if ($autenticiran && $aktiviran == "1") {
             $poruka = 'Uspješna prijava!';
 
             //Create cookie
@@ -44,7 +46,9 @@ if (isset($_POST["submit"])) {
 
             header("Location: ../index.php");
             exit();
-        } else {
+        }else if($aktiviran == "0"){
+            header("Location: account-activation.php?username={$username}");
+        }else {
             $poruka = 'Neuspješna prijava!';
         }
 
