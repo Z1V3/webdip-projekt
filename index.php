@@ -9,9 +9,9 @@ require "php/functions.php";
 $veza = new Baza();
 $veza->spojiDB();
 
-$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id ORDER BY k.korisnicko_ime;";
+$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.status_id = 1 OR iv.status_id = 5 ORDER BY k.korisnicko_ime;";
 if (isset($_POST["search"]) && isset($_POST["submit"])) {
-    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%' ORDER BY k.korisnicko_ime;";
+    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE (iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%') AND (iv.status_id = 1 OR iv.status_id = 5) ORDER BY k.korisnicko_ime;";
 }
 $rezultat = $veza->selectDB($upit);
 
