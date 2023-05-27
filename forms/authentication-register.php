@@ -34,7 +34,7 @@ if (isset($_POST["submit"])) {
 
         $password_sha256 = hash("sha256", $password);
 
-        $query = "INSERT INTO korisnik (korisnicko_ime, ime, prezime, email, lozinka, lozinka_sha256, uvjeti, broj_neuspjesnih_prijava, blokiran, tip_korisnika_id) VALUES ('{$username}','{$firstname}','{$lastname}','{$email}','{$password}','{$password_sha256}','0','0','0','2')";
+        $query = "INSERT INTO korisnik (korisnicko_ime, ime, prezime, email, lozinka, lozinka_sha256, uvjeti, broj_neuspjesnih_prijava, blokiran, aktiviran, tip_korisnika_id) VALUES ('{$username}','{$firstname}','{$lastname}','{$email}','{$password}','{$password_sha256}','0','0','0','0','2')";
 
         $result = $veza->selectDB($query);
 

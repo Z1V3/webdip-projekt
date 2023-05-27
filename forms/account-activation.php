@@ -2,37 +2,129 @@
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
-if(!isset($_SESSION["uloga"])){
-    
-        $kod = rand(100000, 999999);
-        
-        if(isset($_GET["kod"])){
-            global $kod;
-            $kod = $_GET["kod"];
+if (!isset($_SESSION["uloga"])) {
+
+    $testtime = date("Y-m-d H:i:s");
+    $time = date("Y-m-d H:i:s", strtotime(' + 8 hours'));
+
+    $veza = new Baza();
+    $veza->spojiDB();
+
+    $upit = "SELECT kod_id FROM korisnik WHERE korisnicko_ime = '{$_GET["username"]}'";
+    $rezultat = $veza->selectDB($upit);
+
+    $kod_id;
+    while ($red = mysqli_fetch_array($rezultat)) {
+        if ($red) {
+            $kod_id = $red["kod_id"];
         }
-        
-        $mail_to = 'andrijazifko@gmail.com';
+    }
+
+    $upit = "SELECT * from aktivacijski_kod";
+    $rezultat = $veza->selectDB($upit);
+    $kodovi = [];
+    $i = 0;
+    while ($red = mysqli_fetch_array($rezultat)) {
+        if ($red) {
+            $kodovi[$i] = $red["kod"];
+        }
+        $i++;
+    }
+    
+    $kod_rand;
+    do {
+        $kod_rand = rand(100000, 999999);
+    } while (in_array($rand, $kodovi));
+
+    $veza->zatvoriDB();
+    if (isset($kod_id)) {
+        $veza = new Baza();
+        $veza->spojiDB();
+        $upit = "SELECT * FROM aktivacijski_kod WHERE kod_id = '{$kod_id}'";
+        $rezultat = $veza->selectDB($upit);
+
+        $vrijedi_do;
+        $kod;
+        while ($red = mysqli_fetch_array($rezultat)) {
+            if ($red) {
+                $vrijedi_do = $red["vrijedi_do"];
+                $kod = $red["kod"];
+            }
+        }
+        if (strtotime($vrijedi_do) < date("Y-m-d H:i:s")) {
+            if (isset($_POST["submit"])) {
+                if ($_POST["activation_code"] == $kod) {
+
+                    $veza = new Baza();
+                    $veza->spojiDB();
+                    $upit = "UPDATE korisnik SET aktiviran = 1 WHERE korisnicko_ime = '{$_GET["username"]}'";
+                    $rezultat = $veza->selectDB($upit);
+                    $veza->zatvoriDB();
+
+                    setcookie("autenticiran", $_GET["username"], false, '/', false);
+
+                    Sesija::kreirajKorisnika($_GET["username"], 2);
+
+                    header("Location: ../index.php");
+                    exit();
+                }
+            }
+        } else {
+            $veza = new Baza();
+            $veza->spojiDB();
+
+            $kod_id;
+            $upit = "SELECT * FROM aktivacijski_kod WHERE kod = '{$kod}'";
+            $rezultat = $veza->selectDB($upit);
+            while ($red = mysqli_fetch_array($rezultat)) {
+                if ($red) {
+                    $kod_id = $red["kod_id"];
+                }
+            }
+
+            $upit = "UPDATE aktivacijski_kod SET kod = '{$kod_rand}' , vrijedi_do = '{$time}' WHERE kod_id = {$kod_id}";
+            $rezultat = $veza->selectDB($upit);
+
+            $upit = "UPDATE korisnik SET kod_id = '{$kod_id}' WHERE korisnicko_ime = '{$_GET["username"]}'";
+            $rezultat = $veza->selectDB($upit);
+
+            $mail_to = 'andrijazifko@gmail.com';    //trenutno se salje ovom mailu, ako budem htel drugi mail onda SELECT u bazu $_GET["username"] da se nade o kome je rijec i uzme mu se mail i onda se tom posalje
+            $mail_from = "qick319@gmail.com";
+            $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
+            $mail_body = "Kod za aktivaciju racuna je: {$kod_rand}";
+
+            mail($mail_to, $mail_subject, $mail_body, $mail_from);
+            $veza->zatvoriDB();
+        }
+    } else {
+        $veza = new Baza();
+        $veza->spojiDB();
+        $upit = "INSERT INTO aktivacijski_kod (kod, vrijedi_do) VALUES ('{$kod_rand}','{$time}')";
+        $rezultat = $veza->selectDB($upit);
+
+        $kod_id;
+        $upit = "SELECT * FROM aktivacijski_kod WHERE kod = '{$kod_rand}'";
+        $rezultat = $veza->selectDB($upit);
+        while ($red = mysqli_fetch_array($rezultat)) {
+            if ($red) {
+                $kod_id = $red["kod_id"];
+            }
+        }
+
+        $upit = "UPDATE korisnik SET kod_id = '{$kod_id}' WHERE korisnicko_ime = '{$_GET["username"]}'";
+        $rezultat = $veza->selectDB($upit);
+
+        $mail_to = 'andrijazifko@gmail.com';    //trenutno se salje ovom mailu, ako budem htel drugi mail onda SELECT u bazu $_GET["username"] da se nade o kome je rijec i uzme mu se mail i onda se tom posalje
         $mail_from = "qick319@gmail.com";
         $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
-        $mail_body = "Kod za aktivaciju racuna je: {$kod}";
+        $mail_body = "Kod za aktivaciju racuna je: {$kod_rand}";
 
-        if (mail($mail_to, $mail_subject, $mail_body, $mail_from)) {
-            echo("Poslana poruka za: '$mail_to'!");
-        } else {
-            echo("Problem kod poruke za: '$mail_to'!");
-        }
-}
-
-if (isset($_POST["submit"])) {
-    if ($_POST["activation_code"] == $kod) {
-
-        setcookie("autenticiran", $_GET["username"], false, '/', false);
-
-        Sesija::kreirajKorisnika($_GET["username"], 2);
-
-        header("Location: ../index.php");
-        exit();
+        mail($mail_to, $mail_subject, $mail_body, $mail_from);
+        $veza->zatvoriDB();
     }
+} else {
+    header("Location: ../index.php");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -182,7 +274,7 @@ if (isset($_POST["submit"])) {
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>?kod=<?php echo $kod;?>" novalidate>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>?username=<?php echo $_GET["username"] ?>" novalidate>
                     <h3>Registracija</h3>
 
                     <p>Poslali smo vam kod za aktivaciju registracije na e-mail.</p>
@@ -190,7 +282,7 @@ if (isset($_POST["submit"])) {
                     <input type="text" placeholder="Enter here" id="activation_code" name="activation_code">
 
                     <button name="submit">Potvrdi aktivaciju</button><br><br>
-                    
+
                     <a href="authentication-login.php">Logiraj se</a>
                 </form>
 

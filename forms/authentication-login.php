@@ -10,6 +10,7 @@ if (isset($_SESSION["uloga"])) {
 
 if (isset($_POST["submit"])) {
     $error = "";
+    $aktiviran;
     $username = $_POST["username"];
     $password = $_POST["password"];
     if (!isset($_POST["username"]) || !isset($_POST["password"])) {
@@ -25,17 +26,21 @@ if (isset($_POST["submit"])) {
         $rezultat = $veza->selectDB($upit);
 
         $autenticiran = false;
+        $tip;
         while ($red = mysqli_fetch_array($rezultat)) {
             if ($red) {
                 $autenticiran = true;
                 $tip = $red["tip_korisnika_id"];
                 $email = $red["email"];
+                $aktiviran = $red["aktiviran"];
+                $blokiran = $red["blokiran"];
             }
         }
 
-        if ($autenticiran) {
+        if ($autenticiran && $aktiviran == "1" && $tip != "1" && $blokiran == "0") {
             $poruka = 'Uspješna prijava!';
-
+            $upit = "UPDATE korisnik SET broj_neuspjesnih_prijava = 0 WHERE korisnicko_ime = '{$username}'";
+            $veza->selectDB($upit);
             //Create cookie
             setcookie("autenticiran", $username, false, '/', false);
 
@@ -44,8 +49,29 @@ if (isset($_POST["submit"])) {
 
             header("Location: ../index.php");
             exit();
+        } else if ($aktiviran == "0") {
+            header("Location: account-activation.php?username={$username}");
         } else {
             $poruka = 'Neuspješna prijava!';
+
+            $upit = "SELECT * FROM `korisnik` WHERE korisnicko_ime ='{$username}'";
+            $rezultat = $veza->selectDB($upit);
+            while ($red = mysqli_fetch_array($rezultat)) {
+                if ($red && $red["blokiran"] == "0") {
+                    $upit = "UPDATE korisnik SET broj_neuspjesnih_prijava = broj_neuspjesnih_prijava + 1 WHERE korisnicko_ime = '{$username}'";
+                    $veza->selectDB($upit);
+                }
+            }
+            $upit = "SELECT * FROM `korisnik` WHERE korisnicko_ime ='{$username}'";
+            $rezultat = $veza->selectDB($upit);
+            while ($red = mysqli_fetch_array($rezultat)) {
+                if ($red) {
+                    if($red["broj_neuspjesnih_prijava"] > 3){
+                        $upit = "UPDATE korisnik SET broj_neuspjesnih_prijava = 0 AND blokiran = 1 WHERE korisnicko_ime = '{$username}'";
+                        $veza->selectDB($upit);
+                    }
+                }
+            }
         }
 
         $veza->zatvoriDB();
