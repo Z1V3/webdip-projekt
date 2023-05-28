@@ -13,6 +13,14 @@ $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistv
 if (isset($_POST["search"]) && isset($_POST["submit"])) {
     $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE (iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%') AND (iv.status_id = 1 OR iv.status_id = 5) ORDER BY k.korisnicko_ime;";
 }
+
+if ($_SESSION["uloga"] > "2") {
+    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id ORDER BY k.korisnicko_ime;";
+    if (isset($_POST["search"]) && isset($_POST["submit"])) {
+        $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%' ORDER BY k.korisnicko_ime;";
+    }
+}
+
 $rezultat = $veza->selectDB($upit);
 
 if ($rezultat->num_rows > 0) {
@@ -30,6 +38,7 @@ if ($rezultat->num_rows > 0) {
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/content.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+        <link href="https://fonts.cdnfonts.com/css/bahnschrift" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -38,7 +47,7 @@ if ($rezultat->num_rows > 0) {
         <script src="js/ajax.js"></script>
         <style>
             html,body,h1,h2,h3,h4 {
-                font-family:"Lato", sans-serif
+                font-family:"Bahnschrift"
             }
             ul{
                 background-color: darkgray;
@@ -73,16 +82,16 @@ if ($rezultat->num_rows > 0) {
                 margin-right: 150px;
                 margin-top: 150px;
                 text-align: center;
-                height: 550px;
+                height: 600px;
                 width: 350px;
-                background-color: #494F52;
+                background-color: white;
+                box-shadow: 20px 20px #525E6C;
             }
 
             .product:nth-child(-n+5) {
                 margin-top: 400px;
             }
-
-
+            
             .product img {
                 margin-top: 15px;
                 width: 200px;
@@ -91,27 +100,34 @@ if ($rezultat->num_rows > 0) {
             }
 
             .product h3 {
+                background-color: #181A25;
+                color: white;
+                padding: 5px;
                 margin-top: 10px;
             }
 
             .product p {
+                text-align: left;
                 margin: 10px 0;
+                margin-left: 10px;
             }
 
             .product .price {
+                background-color: #E94555;
+                color: white;
                 font-weight: bold;
             }
 
             h3,p,span {
-                color: white;
+                color: black;
             }
             h3,span {
                 font-size: 30px;
             }
 
             .intellectual_property:hover{
-                color:#000!important;
-                background-color:black !important
+                color:white!important;
+                background-color:#E94555!important
             }
 
             .search{
@@ -120,6 +136,13 @@ if ($rezultat->num_rows > 0) {
                 top: 23%;
                 left: 70%;
                 color: white;
+            }
+            .background{
+                position: fixed;
+                z-index: -1;
+                width: 1080px;
+                left: 0%;
+                top: 0%;
             }
         </style>
     </head>
@@ -130,6 +153,7 @@ if ($rezultat->num_rows > 0) {
         include "php/meni.php";
         ?>
 
+        <img src="multimedia/abstract.jpg" class="background">
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
 
@@ -147,14 +171,16 @@ if ($rezultat->num_rows > 0) {
             if (!empty($data)) {
                 foreach ($data as $product) {
                     echo "<div class='product intellectual_property'>";
-                    echo "<a href='forms/intellectual_property.php?=property_id=$product[intelektualno_vlasnistvo_id]'>";
+                    echo "<a href='forms/intellectual_property.php?=property_id=$product[intelektualno_vlasnistvo_id]' style='text-decoration: none;'>";
                     echo "<img src='multimedia/$product[slika]' alt='$product[slika]' style='height: 200px; width: 200px; background-color: white;'>";
                     echo "<h3>$product[naziv_intelektualno_vlasnistvo]</h3>";
-                    echo "<p style='text-align: justify; margin-left: 15px; margin-right: 15px;'>Opis: $product[opis]</p>";
+                    echo "<p >Opis: $product[opis]</p>";
                     echo "<p style='font-size: 20px;'>Tip: $product[naziv_tip_intelektualno_vlasnistvo]</p>";
                     echo "<p style='font-size: 20px;'>Vlasnik: $product[korisnicko_ime]</p>";
                     echo "<p style='font-size: 20px;'>Status: $product[naziv_status]</p>";
+                    echo "<div class='price'>";
                     echo "<span class='price'>Cijena koristenja:<br>$" . $product['cijena_koristenja'] . "</span>";
+                    echo "</div>";
                     echo "</a>";
                     echo "</div>";
                 }
