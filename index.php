@@ -9,15 +9,15 @@ require "php/functions.php";
 $veza = new Baza();
 $veza->spojiDB();
 
-$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.status_id = 1 OR iv.status_id = 5 ORDER BY k.korisnicko_ime;";
+$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.status_id = 1 OR iv.status_id = 5 ORDER BY k.korisnicko_ime;";
 if (isset($_POST["search"]) && isset($_POST["submit"])) {
-    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE (iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%') AND (iv.status_id = 1 OR iv.status_id = 5) ORDER BY k.korisnicko_ime;";
+    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE (iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%') AND (iv.status_id = 1 OR iv.status_id = 5) ORDER BY k.korisnicko_ime;";
 }
 
 if ($_SESSION["uloga"] > "2") {
-    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id ORDER BY k.korisnicko_ime;";
+    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id ORDER BY k.korisnicko_ime;";
     if (isset($_POST["search"]) && isset($_POST["submit"])) {
-        $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%' ORDER BY k.korisnicko_ime;";
+        $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.naziv_intelektualno_vlasnistvo LIKE '%{$_POST["search"]}%' ORDER BY k.korisnicko_ime;";
     }
 }
 
@@ -86,6 +86,7 @@ if ($rezultat->num_rows > 0) {
                 width: 350px;
                 background-color: white;
                 box-shadow: 20px 20px #525E6C;
+                border-radius: 25px;
             }
 
             .product:nth-child(-n+5) {
@@ -104,6 +105,7 @@ if ($rezultat->num_rows > 0) {
                 color: white;
                 padding: 5px;
                 margin-top: 10px;
+                border-radius: 0px;
             }
 
             .product p {
@@ -113,6 +115,7 @@ if ($rezultat->num_rows > 0) {
             }
 
             .product .price {
+                border-radius: 0px;
                 background-color: #E94555;
                 color: white;
                 font-weight: bold;
@@ -127,7 +130,7 @@ if ($rezultat->num_rows > 0) {
 
             .intellectual_property:hover{
                 color:white!important;
-                background-color:#E94555!important
+                background-color:#f58792!important
             }
 
             .search{
@@ -143,6 +146,14 @@ if ($rezultat->num_rows > 0) {
                 width: 1080px;
                 left: 0%;
                 top: 0%;
+            }
+            .priceBorder{
+                border-top: 10px;
+                border-bottom: 10px;
+                border-left: 0px;
+                border-right: 0px;
+                border-style: solid;
+                border-color: #f58792;
             }
         </style>
     </head>
@@ -178,7 +189,7 @@ if ($rezultat->num_rows > 0) {
                     echo "<p style='font-size: 20px;'>Tip: $product[naziv_tip_intelektualno_vlasnistvo]</p>";
                     echo "<p style='font-size: 20px;'>Vlasnik: $product[korisnicko_ime]</p>";
                     echo "<p style='font-size: 20px;'>Status: $product[naziv_status]</p>";
-                    echo "<div class='price'>";
+                    echo "<div class='price priceBorder'>";
                     echo "<span class='price'>Cijena koristenja:<br>$" . $product['cijena_koristenja'] . "</span>";
                     echo "</div>";
                     echo "</a>";

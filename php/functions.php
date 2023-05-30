@@ -1,11 +1,8 @@
 <?php
 
-require 'dnevnik.class.php';
 require 'baza.class.php';
 require 'sesija.class.php';
 
-$dnevnik = new Dnevnik();
-$dnevnik->setNazivDatoteke("$direktorij/izvorne_datoteke/dnevnik.log");
 $tekst = basename($_SERVER['PHP_SELF']);
 
 if (isset($_COOKIE)) {
