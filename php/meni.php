@@ -25,7 +25,7 @@ if (!isset($_SESSION["uloga"])) {
 }
 if ($_SESSION["uloga"] > "1"){
     $meni .= "<div class=\"col s3\">
-                    <a href=\"#about\" class=\"button block\">Kreiraj zahtjev</a>
+                    <a href=\"$putanja/forms/create-request.php\" class=\"button block\">Kreiraj zahtjev</a>
                 </div>
                 <div class=\"col s3\">
                     <a href=\"#contact\" class=\"button block\">Moja vlasništva</a>
