@@ -28,7 +28,7 @@ if ($_SESSION["uloga"] > "1"){
                     <a href=\"$putanja/forms/create-request.php\" class=\"button block\">Kreiraj zahtjev</a>
                 </div>
                 <div class=\"col s3\">
-                    <a href=\"#contact\" class=\"button block\">Moja vlasništva</a>
+                    <a href=\"$putanja/other_pages/my_property.php\" class=\"button block\">Moja vlasništva</a>
                 </div>
                 <div class=\"col s3\">
                     <a href=\"#contact\" class=\"button block\">Prijavi vlasništvo</a>

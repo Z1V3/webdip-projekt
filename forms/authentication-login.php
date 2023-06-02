@@ -66,7 +66,7 @@ if (isset($_POST["submit"])) {
             $rezultat = $veza->selectDB($upit);
             while ($red = mysqli_fetch_array($rezultat)) {
                 if ($red) {
-                    if($red["broj_neuspjesnih_prijava"] > 3){
+                    if ($red["broj_neuspjesnih_prijava"] > 3) {
                         $upit = "UPDATE korisnik SET broj_neuspjesnih_prijava = 0 AND blokiran = 1 WHERE korisnicko_ime = '{$username}'";
                         $veza->selectDB($upit);
                     }
@@ -104,8 +104,6 @@ if (isset($_POST["submit"])) {
                 margin-top:6px
             }
 
-
-
             *:after{
                 padding: 0;
                 margin: 0;
@@ -114,6 +112,11 @@ if (isset($_POST["submit"])) {
             body{
                 background-color: #080710;
             }
+
+            html{
+                background: #1e202b;
+            }
+
             .background{
                 width: 430px;
                 height: 520px;
