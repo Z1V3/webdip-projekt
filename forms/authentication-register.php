@@ -1,8 +1,54 @@
+<?php
+$putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
+include "../php/functions.php";
+
+if (isset($_SESSION["uloga"])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+if (isset($_POST["submit"])) {
+    $error = "";
+    $username = $_POST["username"];
+    $firstname = $_POST["firstname"];
+    $lastname = $_POST["lastname"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $confirmPassword = $_POST["confirm_password"];
+
+    $regex = "/^[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+[\w]+@+[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+$/";
+    if (!preg_match($regex, $email)) {
+        $error .= "Email polje nije pravilno popunjeno!";
+    }
+
+    $regex = '/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?/~_+\-=|\]).{8,32}$/';
+    if (!preg_match($regex, $password)) {
+        $error .= "Lozinka mora sadržavati barem jedan broj, jedno veliko i jedno malo slovo te specijalan znak i u rangu je od 8 do 32 znakova!";
+    }
+
+    if (empty($greska)) {
+
+        $veza = new Baza();
+        $veza->spojiDB();
+
+        $password_sha256 = hash("sha256", $password);
+
+        $query = "INSERT INTO korisnik (korisnicko_ime, ime, prezime, email, lozinka, lozinka_sha256, uvjeti, broj_neuspjesnih_prijava, blokiran, aktiviran, tip_korisnika_id) VALUES ('{$username}','{$firstname}','{$lastname}','{$email}','{$password}','{$password_sha256}','0','0','0','0','2')";
+
+        $result = $veza->selectDB($query);
+
+        $veza->zatvoriDB();
+
+        header("Location: account-activation.php?username={$username}");
+        exit();
+    }
+}
+?>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>W3.CSS Template</title>
+        <title>Intelektualno vlasnistvo</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="../css/content.css">
@@ -25,8 +71,6 @@
                 margin-top:6px
             }
 
-
-            
             *:after{
                 padding: 0;
                 margin: 0;
@@ -35,6 +79,11 @@
             body{
                 background-color: #080710;
             }
+
+            html{
+                background: #1e202b;
+            }
+
             .background{
                 width: 430px;
                 height: 520px;
@@ -64,15 +113,15 @@
                     #f09819
                     );
                 right: -130px;
-                bottom: -480px;
+                bottom: -500px;
             }
             form{
-                height: 1100px;
+                height: 970px;
                 width: 600px;
                 background-color: rgba(255,255,255,0.13);
                 position: absolute;
                 transform: translate(-50%,-50%);
-                top: 71%;
+                top: 66%;
                 left: 50%;
                 border-radius: 10px;
                 border: 2px solid rgba(255,255,255,0.1);
@@ -85,7 +134,7 @@
                 letter-spacing: 0.5px;
                 outline: none;
                 border: none;
-            }s
+            }
             form h3{
                 font-size: 32px;
                 font-weight: 500;
@@ -132,34 +181,9 @@
     <body>
 
         <!-- Menu -->
-        <div class="top">
-            <div class="row large light-grey">
-                <div class="col s3">
-                    <a href="../index.php" class="button block">Popis zahtjeva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#plans" class="button block">O autoru</a>
-                </div>
-                <div class="col s3">
-                    <a href="#about" class="button block">Kreiraj zahtjev</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Moja vlasništva</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Popis vlasnika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Statistika</a>
-                </div>
-                <div class="col s3">
-                    <a href="#contact" class="button block">Prijavi vlasništvo</a>
-                </div>
-                <div class="col s3">
-                    <a href="authentication.php" class="button block">Prijava / Registracija</a>
-                </div>
-            </div>
-        </div>
+        <?php
+        include "../php/meni.php";
+        ?>
 
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
@@ -171,32 +195,29 @@
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form>
-                    <h3>Register</h3>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
+                    <h3>Registracija</h3>
 
                     <label for="username">Username</label>
-                    <input type="text" placeholder="Email or Phone" id="username">
+                    <input type="text" placeholder="Email or Phone" id="username" name="username">
+
+                    <label for="firstname">Firstname</label>
+                    <input type="text" placeholder="Firstname" id="firstname" name="firstname">
+
+                    <label for="lastname">Lastname</label>
+                    <input type="text" placeholder="Lastname" id="lastname" name="lastname">
+
+                    <label for="email">Email</label>
+                    <input type="email" placeholder="Email" id="email" name="email">
 
                     <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
+                    <input type="password" placeholder="Password" id="password" name="password">
 
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
-                    
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
-                    
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
-                    
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
-                    
-                    <label for="password">Password</label>
-                    <input type="password" placeholder="Password" id="password">
-                    
-                    <button>Registriraj se</button><br><br>
-                    
+                    <label for="confirm_password">Confirm password</label>
+                    <input type="password" placeholder="Confirm password" id="confirm_password" name="confirm_password">
+
+                    <button name="submit">Registriraj se</button><br><br>
+
                     <a href="authentication-login.php">Logiraj se</a>
                 </form>
 
