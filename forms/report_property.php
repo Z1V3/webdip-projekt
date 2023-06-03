@@ -1,43 +1,35 @@
 <?php
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
-if ($putanja == "/azivko") {
-    $putanja = "/azivko/webdip_projekt";
-}
 require "../php/functions.php";
 
 if (isset($_POST["submit"])) {
-    $name = $_POST["name"];
-    $type = $_POST["type"];
-    $description = $_POST["description"];
-    $price = $_POST["price"];
-    $username = $_SESSION["korisnik"];
-    if (is_numeric($price) && strlen($description) < 100 && strlen($name) < 45) {
-        $veza = new Baza();
-        $veza->spojiDB();
-        $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$username}'";
+    $veza = new Baza();
+    $veza->spojiDB();
+
+    if (isset($_POST["id"]) && isset($_POST["description"]) && isset($_POST["name"]) && is_numeric($_POST["id"]) && strlen($_POST["description"]) < 300 && strlen($_POST["name"]) < 45) {
+        $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_SESSION["korisnik"]}'";
         $rezultat = $veza->selectDB($upit);
-        $korisnik_id = "";
+        $user_id;
         while ($red = mysqli_fetch_array($rezultat)) {
             if ($red) {
-                $korisnik_id = $red["korisnik_id"];
+                $user_id = $red["korisnik_id"];
             }
         }
-        $targetDirectory = "../multimedia/"; 
-        $targetFile = $targetDirectory . basename($_FILES["image"]["name"]);
-        $targetFileName = basename($_FILES["image"]["name"]);
-        
-        $message = "";
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
-            $message = "The file has been uploaded successfully.";
-        } else {
-            $message = "Sorry, there was an error uploading your file.";
-        }
 
-        $upit = "INSERT INTO intelektualno_vlasnistvo (naziv_intelektualno_vlasnistvo, opis_intelektualno_vlasnistvo, slika, cijena_koristenja, tip_intelektualnog_vlasnistva_id, korisnik_id, status_id) VALUES ( '{$name}', '{$description}', '{$targetFileName}', '{$price}','{$type}', '{$korisnik_id}', '3')";
-        $veza->selectDB($upit);
-        $veza->zatvoriDB();        
+        $user_id = intval($user_id);
+        
+        $upit = "INSERT INTO prijava (naslov, razlog, intelektualno_vlasnistvo_id, korisnik_id) VALUES ('{$_POST["name"]}', '{$_POST["description"]}', '{$_POST["id"]}', '{$user_id}')";
+        if ($veza->selectDB($upit)) {
+            $message = "Prijava uspjesno poslana!";
+            $veza->zatvoriDB();
+            header("Location: ../index.php?message=report_uspjeh");
+            exit();
+        } else {
+            $message = "Greska kod slanja prijave!";
+            $veza->zatvoriDB();
         }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -57,16 +49,28 @@ if (isset($_POST["submit"])) {
         <script src="../js/ajax.js"></script>
         <style>
             html,body,h1,h2,h3,h4 {
-                font-family:"Bahnschrift"
+                font-family:"Bahnschrift";
             }
+            html{
+                background: #1e202b;
+            }
+
             .panel{
                 position: absolute;
                 top: 10%;
                 left: 37%;
             }
+
+            h3,p,span {
+                color: black;
+            }
+            h3,span {
+                font-size: 30px;
+            }
+
             .background{
                 position: fixed;
-                z-index: 0;
+                z-index: -1;
                 width: 1080px;
                 left: 0%;
                 top: 0%;
@@ -121,7 +125,7 @@ if (isset($_POST["submit"])) {
                 border-radius: 12px;
                 border: 0;
                 box-sizing: border-box;
-                color: #eee;
+                color: black;
                 font-size: 18px;
                 height: 100%;
                 outline: 0;
@@ -202,60 +206,6 @@ if (isset($_POST["submit"])) {
                 width: 100%;
             }
 
-            .selectdiv {
-                position: relative;
-                /*Don't really need this just for demo styling*/
-
-                min-width: 200px;
-                margin: 50px 33%;
-            }
-
-            /* IE11 hide native button (thanks Matt!) */
-            select::-ms-expand {
-                display: none;
-            }
-
-            .selectdiv:after {
-                content: '<>';
-                font: 17px "Consolas", monospace;
-                color: #333;
-                -webkit-transform: rotate(90deg);
-                -moz-transform: rotate(90deg);
-                -ms-transform: rotate(90deg);
-                transform: rotate(90deg);
-                right: 11px;
-                /*Adjust for position however you want*/
-
-                top: 18px;
-                padding: 0 0 2px;
-                border-bottom: 1px solid #999;
-                /*left line */
-
-                position: absolute;
-                pointer-events: none;
-            }
-
-            .selectdiv select {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-                /* Add some styling */
-
-                width: 100%;
-                max-width: 320px;
-                height: 50px;
-                margin: 5px 0px;
-                padding: 0px 24px;
-                font-size: 16px;
-                line-height: 1.75;
-                color: #333;
-                background-color: #ffffff;
-                background-image: none;
-                border: 1px solid #cccccc;
-                -ms-word-break: normal;
-                word-break: normal;
-            }
-
         </style>
     </head>
     <body>
@@ -265,7 +215,7 @@ if (isset($_POST["submit"])) {
         include "../php/meni.php";
         ?>
 
-        <img src="../multimedia/abstract.jpg" class="background" alt="abstract.jpg">
+        <img src="../multimedia/abstract.jpg" class="background">
         <!-- Content -->
         <div class="content" style="max-width:1100px;margin-top:80px;margin-bottom:80px">
 
@@ -273,42 +223,75 @@ if (isset($_POST["submit"])) {
                 <h1><b>Intelektualna vlasništva</b></h1>
             </div>
 
-
-            <form class="form" novalidate method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" enctype=multipart/form-data>
-                <div class="title">Kreiranje zahtjeva</div>
+            <form class="form" novalidate method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" onsubmit="provjeri()">
+                <div class="title">Kreiranje prijave</div>
                 <div class="subtitle">Ovdje upišite podatke</div>
                 <div class="input-container inpu1">
+                    <input id="property_id" class="input" type="text" name="id" placeholder=" " value="<?php echo $_GET["id"]; ?>" onkeyup="postoji()"/>
+                    <div class="cut"></div>
+                    <label for="firstname" class="placeholder">ID</label>
+                    <label id="error_label"></label>
+                </div>
+
+                <div class="input-container input2">
                     <input id="name" class="input" type="text" name="name" placeholder=" " />
                     <div class="cut"></div>
                     <label for="firstname" class="placeholder">Naziv</label>
                 </div>
 
-                <div class="input-container input2 selectdiv">
-                    <label>
-                        <select name="type" id="type">
-                            <option selected value="0">Patent</option>
-                            <option value="1">Naziv domene</option>
-                            <option value="2">Izum</option>
-                            <option value="3">Prava na bazu podataka</option>
-                            <option value="4">Robni zig</option>
-                        </select>
-                    </label>
-                </div>
-
                 <div class="input-container input3">
                     <textarea id="description" class="textarea" name="description" type="text" placeholder=" "></textarea>
                     <div class="cut"></div>
-                    <label for="lastname" class="placeholder">Opis</label>
+                    <label for="lastname" class="placeholder">Opis prijave</label>
                 </div>
-                <input type="file" name="image" id="image" style="margin-bottom: 40px;">
                 <div class="input-container input4">
-                    <input id="email" class="input" name="price" type="text" placeholder=" " />
-                    <div class="cut "></div>
-                    <label for="email" class="placeholder">Cijena</>
+
                 </div>
-                <?php echo "<div style='float: right; margin-top: 20px; margin-right: 20px; font-size: 20px;'>" . $message . "</div>";?>
-                <button type="text" class="submit" name="submit">Kreiraj</button>
+                <?php echo "<div style='float: right; margin-top: 20px; margin-right: 20px; font-size: 20px;'>" . $message . "</div>"; ?>
+                <button type="text" id="submit_button" class="submit" name="submit">Posalji prijavu</button>
             </form>
+
+
         </div>
+
+        <script>
+            function provjeri() {
+                var property_id = document.getElementById("property_id").value;
+                if (isNaN(property_id)) {
+                    alert("Broj vlasnistva mora biti numericki znak!");
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            function postoji() {
+                var property_id = document.getElementById("property_id").value;
+                if (isNaN(property_id)) {
+                    document.getElementById("error_label").innerHTML = "Broj vlasnistva mora biti numericki znak!";
+                    document.getElementById("property_id").value="";
+                    return;
+                }else if(property_id === null || property_id === 'undefined' || property_id.indexOf(" ") >= 0 || property_id === ''){
+                    document.getElementById("error_label").innerHTML = "Broj vlasnistva ne smije biti prazan ili sadrzavati razmak!";
+                    return;
+                } else {
+                    $.ajax({
+                        type: "GET",
+                        url: "../php/report.php",
+                        data: {property_id: property_id},
+                        success: function (result) {
+                            console.log(typeof result + " " + result);
+                            if(result === "0"){
+                                document.getElementById("error_label").innerHTML="ID ne postoji!";
+                            }else{
+                                document.getElementById("error_label").innerHTML="";
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            }
+        </script>
     </body>
 </html>

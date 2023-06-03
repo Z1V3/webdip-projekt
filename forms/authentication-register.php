@@ -71,8 +71,6 @@ if (isset($_POST["submit"])) {
                 margin-top:6px
             }
 
-
-
             *:after{
                 padding: 0;
                 margin: 0;
@@ -81,6 +79,11 @@ if (isset($_POST["submit"])) {
             body{
                 background-color: #080710;
             }
+
+            html{
+                background: #1e202b;
+            }
+
             .background{
                 width: 430px;
                 height: 520px;

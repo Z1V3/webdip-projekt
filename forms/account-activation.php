@@ -30,7 +30,7 @@ if (!isset($_SESSION["uloga"])) {
         }
         $i++;
     }
-    
+
     $kod_rand;
     do {
         $kod_rand = rand(100000, 999999);
@@ -65,7 +65,7 @@ if (!isset($_SESSION["uloga"])) {
 
                     Sesija::kreirajKorisnika($_GET["username"], 2);
 
-                    header("Location: ../index.php");
+                    header("Location: ../index.php?message=register_uspjeh");
                     exit();
                 }
             }
@@ -140,6 +140,14 @@ if (!isset($_SESSION["uloga"])) {
             html,body,h1,h2,h3,h4 {
                 font-family:"Lato", sans-serif
             }
+
+            body{
+                background-color: #080710;
+            }
+            html{
+                background: #1e202b;
+            }
+
             .mySlides {
                 display:none
             }
@@ -159,9 +167,6 @@ if (!isset($_SESSION["uloga"])) {
                 padding: 0;
                 margin: 0;
                 box-sizing: border-box;
-            }
-            body{
-                background-color: #080710;
             }
             .background{
                 width: 430px;
