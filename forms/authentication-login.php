@@ -47,7 +47,7 @@ if (isset($_POST["submit"])) {
             //Create session
             Sesija::kreirajKorisnika($username, $tip);
 
-            header("Location: ../index.php");
+            header("Location: ../index.php?message=login_uspjeh");
             exit();
         } else if ($aktiviran == "0") {
             header("Location: account-activation.php?username={$username}");

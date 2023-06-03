@@ -40,8 +40,8 @@ if($moje_vlasnistvo == 1){
 $upit = "INSERT INTO placanje (iznos, datum_vrijeme_placanja, opis, moje_vlasnistvo, korisnik_id, intelektualno_vlasnistvo_id) VALUES ('{$_GET["value"]}', '{$time_now}', 'Opis', '{$moje_vlasnistvo}', '{$user_id}', '{$property_id}')";
 if($veza->selectDB($upit)){
     $veza->zatvoriDB();
-    echo "Placenanje izvrseno!";
+    echo "1";
 }else{
     $veza->zatvoriDB();
-    echo "Greska kod placanja!";
+    echo "0";
 }

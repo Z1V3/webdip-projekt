@@ -65,7 +65,7 @@ if (!isset($_SESSION["uloga"])) {
 
                     Sesija::kreirajKorisnika($_GET["username"], 2);
 
-                    header("Location: ../index.php");
+                    header("Location: ../index.php?message=register_uspjeh");
                     exit();
                 }
             }

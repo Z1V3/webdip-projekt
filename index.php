@@ -180,7 +180,15 @@ $veza->zatvoriDB();
                 border-style: solid;
                 border-color: #f58792;
             }
-            .btn{
+            .btn_kupi{
+                width: 150px;
+                margin-top: 8px;
+                font-size: 19px;
+                border-radius: 10px;
+                background-color: gray;
+                color: white;
+            }
+            .btn_prijavi{
                 width: 150px;
                 margin-top: 8px;
                 font-size: 19px;
@@ -234,8 +242,11 @@ $veza->zatvoriDB();
                             }
                         }
                         if (!$vec_placeno) {
-                            echo "<button class='btn' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Plati</button>";
+                            echo "<button class='btn_kupi' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Kupi</button>";
                         }
+                    }
+                    if ($product["korisnicko_ime"] != $_SESSION["korisnik"]) {
+                        echo "<a href='forms/report_property.php?id={$product["intelektualno_vlasnistvo_id"]}'><button class='btn_prijavi'>Prijavi</button></a>";
                     }
                     echo "</div>";
                 }
@@ -246,9 +257,33 @@ $veza->zatvoriDB();
         </div>
 
         <script>
-            var allButtons = document.querySelectorAll(".btn");
-            for (i = 0; i < allButtons.length; i++) {
-                allButtons[i].addEventListener("click", plati(allButtons[i].name, allButtons[i].value));
+
+            $(document).ready(function () {
+                var poruka = "<?php
+            if (isset($_GET["message"])) {
+                echo $_GET["message"];
+            } else {
+                echo "ne";
+            }
+            ?>";
+                if (poruka !== "ne") {
+                    switch(poruka){
+                        case "login_uspjeh":
+                            alert("Uspješno ste se prijavili!");
+                            break;
+                        case "register_uspjeh":
+                            alert("Uspješno ste se registrirali!");
+                            break;
+                        case "report_uspjeh":
+                            alert("Uspješno se prijavili vlasništvo!");
+                            break;
+                    }
+                }
+            });
+
+            var allButtonsKupi = document.querySelectorAll(".btn_kupi");
+            for (i = 0; i < allButtonsKupi.length; i++) {
+                allButtonsKupi[i].addEventListener("click", plati(allButtonsKupi[i].name, allButtonsKupi[i].value));
             }
             function plati(property_id, property_value) {
                 return function () {
@@ -257,7 +292,11 @@ $veza->zatvoriDB();
                         url: "php/payment.php",
                         data: {property_id: property_id, value: property_value},
                         success: function (result) {
-                            console.log(result);
+                            if (result === "1") {
+                                alert("Placanje uspjesno izvrseno!");
+                            } else {
+                                alert("Greska kod placanja!");
+                            }
                             $("[name='" + property_id + "']").remove();
                         },
                         error: function (xhr, status, error) {
