@@ -23,7 +23,7 @@ if (!isset($_SESSION["uloga"])) {
                 </div>
                 ";
 }
-if ($_SESSION["uloga"] > "1"){
+if ($_SESSION["uloga"] == "2") {
     $meni .= "<div class=\"col s3\">
                     <a href=\"$putanja/forms/create-request.php\" class=\"button block\">Kreiraj zahtjev</a>
                 </div>
@@ -36,7 +36,13 @@ if ($_SESSION["uloga"] > "1"){
                 ";
 }
 
-if ($_SESSION["uloga"] > "2"){
+if ($_SESSION["uloga"] > "2") {
+    $meni .= "<div class=\"col s3\">
+                    <a href=\"$putanja/other_pages/all_requests.php\" class=\"button block\">Pregled zahtjeva</a>
+                </div>";
+}
+
+if ($_SESSION["uloga"] > "2") {
     $meni .= "<div class=\"col s3\">
                     <a href=\"#contact\" class=\"button block\">Statistika</a>
                 </div>

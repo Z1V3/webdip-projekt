@@ -8,7 +8,7 @@ require "../php/functions.php";
 
 if (isset($_POST["submit"])) {
     $name = $_POST["name"];
-    $type = $_POST["type"];
+    $type = strval(intval($_POST["type"]) + 1);
     $description = $_POST["description"];
     $price = $_POST["price"];
     $username = $_SESSION["korisnik"];
@@ -23,10 +23,10 @@ if (isset($_POST["submit"])) {
                 $korisnik_id = $red["korisnik_id"];
             }
         }
-        $targetDirectory = "../multimedia/"; 
+        $targetDirectory = "../multimedia/";
         $targetFile = $targetDirectory . basename($_FILES["image"]["name"]);
         $targetFileName = basename($_FILES["image"]["name"]);
-        
+
         $message = "";
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile)) {
             $message = "The file has been uploaded successfully.";
@@ -34,12 +34,16 @@ if (isset($_POST["submit"])) {
             $message = "Sorry, there was an error uploading your file.";
         }
 
-        $upit = "INSERT INTO intelektualno_vlasnistvo (naziv_intelektualno_vlasnistvo, opis_intelektualno_vlasnistvo, slika, cijena_koristenja, tip_intelektualnog_vlasnistva_id, korisnik_id, status_id) VALUES ( '{$name}', '{$description}', '{$targetFileName}', '{$price}','{$type}', '{$korisnik_id}', '3')";
-        $veza->selectDB($upit);
-        $veza->zatvoriDB();        
+
+        $upit = "INSERT INTO zahtjev (opis, tip_zahtjeva_id, korisnik_id, status_id, tip_intelektualnog_vlasnistva_id) VALUES ('{$name}:_:{$description}:_:{$targetFileName}:_:{$price}:_:{$type}:_:{$korisnik_id}', 1, {$korisnik_id}, 3, {$type})";
+        if ($veza->selectDB($upit)) {
+            header("Location: ../index.php?message=kreiranje_uspjeh");
         }
+        $veza->zatvoriDB();
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -55,6 +59,7 @@ if (isset($_POST["submit"])) {
         <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <script src="../js/ajax.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <style>
             html,body,h1,h2,h3,h4 {
                 font-family:"Bahnschrift"
@@ -274,7 +279,7 @@ if (isset($_POST["submit"])) {
             </div>
 
 
-            <form class="form" novalidate method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" enctype=multipart/form-data>
+            <form class="form" novalidate method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" enctype=multipart/form-data onsubmit="provjeri_file()">
                 <div class="title">Kreiranje zahtjeva</div>
                 <div class="subtitle">Ovdje upišite podatke</div>
                 <div class="input-container inpu1">
@@ -304,11 +309,42 @@ if (isset($_POST["submit"])) {
                 <div class="input-container input4">
                     <input id="email" class="input" name="price" type="text" placeholder=" " />
                     <div class="cut "></div>
-                    <label for="email" class="placeholder">Cijena</>
+                    <label for="email" class="placeholder">Cijena</label>
                 </div>
-                <?php echo "<div style='float: right; margin-top: 20px; margin-right: 20px; font-size: 20px;'>" . $message . "</div>";?>
+                <?php echo "<div style='float: right; margin-top: 20px; margin-right: 20px; font-size: 20px;'>" . $message . "</div>"; ?>
+                <div class="g-recaptcha" data-sitekey="6LfGAWomAAAAAL2YzHdJmwKloSn-fZ_D9JobKRET"></div>
                 <button type="text" class="submit" name="submit">Kreiraj</button>
             </form>
         </div>
+        <script>
+
+            function provjeri_file() {
+                let fileInput = document.getElementById("image");
+                let fileName;
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    fileName = fileInput.files[i].name;
+                }
+                let fcheck = false;
+                $.ajax({
+                    type: "GET",
+                    url: "../php/file_check.php",
+                    data: {file: fileName},
+                    async: false,
+                    success: function (result) {
+                        if (result === "1") {
+                            fcheck = true;
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+
+                if (fcheck) {
+                    alert("Datoteka vec postoji!");
+                    event.preventDefault();
+                }
+            }
+        </script>
     </body>
 </html>

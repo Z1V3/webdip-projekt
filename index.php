@@ -214,15 +214,19 @@ $veza->zatvoriDB();
             </div>
 
             <form  class="search" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
+
                 <label for="search" style="font-size: 30px;">Pretraživanje: </label>
                 <input type="text" placeholder="Pretraži ovdje" id="search" name="search">
-
                 <button name="submit">Pretrazi</button>
             </form>
             <?php
             if (!empty($data)) {
                 foreach ($data as $product) {
-                    echo "<div class='product intellectual_property'>";
+                    if (strlen($product["naziv_intelektualno_vlasnistvo"]) > 24) {
+                        echo "<div class='product intellectual_property' style='height: 660px;'>";
+                    } else {
+                        echo "<div class='product intellectual_property'>";
+                    }
                     echo "<a href='forms/intellectual_property.php?=property_id=$product[intelektualno_vlasnistvo_id]' style='text-decoration: none;'>";
                     echo "<img src='multimedia/$product[slika]' alt='$product[slika]' style='height: 200px; width: 200px; background-color: white;'>";
                     echo "<h3>$product[naziv_intelektualno_vlasnistvo]</h3>";
@@ -245,7 +249,7 @@ $veza->zatvoriDB();
                             echo "<button class='btn_kupi' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Kupi</button>";
                         }
                     }
-                    if ($product["korisnicko_ime"] != $_SESSION["korisnik"]) {
+                    if (isset($_SESSION["korisnik"]) && $product["korisnicko_ime"] != $_SESSION["korisnik"]) {
                         echo "<a href='forms/report_property.php?id={$product["intelektualno_vlasnistvo_id"]}'><button class='btn_prijavi'>Prijavi</button></a>";
                     }
                     echo "</div>";
@@ -267,7 +271,7 @@ $veza->zatvoriDB();
             }
             ?>";
                 if (poruka !== "ne") {
-                    switch(poruka){
+                    switch (poruka) {
                         case "login_uspjeh":
                             alert("Uspješno ste se prijavili!");
                             break;
@@ -276,6 +280,9 @@ $veza->zatvoriDB();
                             break;
                         case "report_uspjeh":
                             alert("Uspješno se prijavili vlasništvo!");
+                            break;
+                        case "kreiranje_uspjeh":
+                            alert("Uspješno kreiran zahtjev!");
                             break;
                     }
                 }
