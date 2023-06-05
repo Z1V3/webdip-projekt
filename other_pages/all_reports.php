@@ -9,45 +9,16 @@ require "../php/functions.php";
 $veza = new Baza();
 $veza->spojiDB();
 
+$upit = "SELECT * FROM prijava";
+$rezultat = $veza->selectDB($upit);
+
 $data = array();
-
-if ($_SESSION["uloga"] === "3") {
-    $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_SESSION["korisnik"]}'";
-    $rezultat = $veza->selectDB($upit);
-    $user_id;
+if ($rezultat->num_rows > 0) {
     while ($red = mysqli_fetch_array($rezultat)) {
-        if ($red) {
-            $user_id = $red["korisnik_id"];
-        }
-    }
-
-    $upit = "SELECT * FROM upravlja WHERE korisnik_id = {$user_id}";
-    $rezultat = $veza->selectDB($upit);
-    $mod_tipovi = array();
-    if ($rezultat->num_rows > 0) {
-        while ($red = mysqli_fetch_array($rezultat)) {
-            $mod_tipovi[] = $red["tip_intelektualnog_vlasnistva_id"];
-        }
-    }
-
-    foreach ($mod_tipovi as $tip) {
-        $upit = "SELECT z.zahtjev_id, z.opis, tz.naziv_tip_zahtjeva, k.korisnicko_ime, s.naziv_status, tiv.naziv_tip_intelektualno_vlasnistvo FROM zahtjev AS z JOIN tip_zahtjeva AS tz ON z.tip_zahtjeva_id = tz.tip_zahtjeva_id JOIN korisnik AS k ON z.korisnik_id = k.korisnik_id JOIN status AS s ON z.status_id = s.status_id JOIN tip_intelektualnog_vlasnistva AS tiv ON z.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id WHERE tiv.tip_intelektualnog_vlasnistva_id = {$tip} AND z.status_id != 2";
-        $rezultat = $veza->selectDB($upit);
-        if ($rezultat->num_rows > 0) {
-            while ($red = mysqli_fetch_array($rezultat)) {
-                $data[] = $red;
-            }
-        }
-    }
-} else if ($_SESSION["uloga"] === "4") {
-    $upit = "SELECT z.zahtjev_id, z.opis, tz.naziv_tip_zahtjeva, k.korisnicko_ime, s.naziv_status, tiv.naziv_tip_intelektualno_vlasnistvo FROM zahtjev AS z JOIN tip_zahtjeva AS tz ON z.tip_zahtjeva_id = tz.tip_zahtjeva_id JOIN korisnik AS k ON z.korisnik_id = k.korisnik_id JOIN status AS s ON z.status_id = s.status_id JOIN tip_intelektualnog_vlasnistva AS tiv ON z.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id WHERE z.status_id != 2";
-    $rezultat = $veza->selectDB($upit);
-    if ($rezultat->num_rows > 0) {
-        while ($red = mysqli_fetch_array($rezultat)) {
-            $data[] = $red;
-        }
+        $data[] = $red;
     }
 }
+
 $veza->zatvoriDB();
 ?>
 <!DOCTYPE html>
@@ -153,15 +124,17 @@ $veza->zatvoriDB();
                 left: 0%;
                 top: 0%;
             }
-            .btn_p{
+            .btn_v{
                 border-radius: 10px;
+
                 font-family:"Bahnschrift";
                 width: 100px;
                 height: 30px;
-                margin-bottom: 5px;
                 background-color: lightgreen;
                 font-weight: bold;
+                margin-bottom: 5px;
             }
+
             .btn_o{
                 border-radius: 10px;
                 font-family:"Bahnschrift";
@@ -194,32 +167,21 @@ $veza->zatvoriDB();
                     echo "<thead>";
                     echo "<tr>";
                     echo "<th>ID</th>";
-                    echo "<th>Naziv</th>";
-                    echo "<th>Tip vlasnistva</th>";
-                    echo "<th>Opis</th>";
-                    echo "<th>Slika</th>";
-                    echo "<th>Cijena koristenja</th>";
-                    echo "<th>Vlasnik</th>";
-                    echo "<th>Tip zahtjeva</th>";
-                    echo "<th>Status</th>";
-                    echo "<th>Opcija</th>";
+                    echo "<th>Naslov</th>";
+                    echo "<th>Razlog</th>";
+                    echo "<th>Intelektualno vlasnistvo</th>";
+                    echo "<th>Korisnik</th>";
+                    echo "<th>Odluka</th>";
                     echo "<tbody>";
                     foreach ($data as $product) {
-
-                        $opis = explode(":_:", $product["opis"]);
-
                         echo "<tr>";
-                        echo "<td>" . $product["zahtjev_id"] . "</td>";
-                        echo "<td>" . $opis[0] . "</td>";
-                        echo "<td>" . $product["naziv_tip_intelektualno_vlasnistvo"] . "</td>";
-                        echo "<td>" . $opis[1] . "</td>";
-                        echo "<td>" . "<img src=\"../multimedia/{$opis[2]}\" alt='{$product["slika"]}' width=50px>" . "</td>";
-                        echo "<td>" . $opis[3] . "$</td>";
-                        echo "<td>" . $product["korisnicko_ime"] . "</td>";
-                        echo "<td>" . $product["naziv_tip_zahtjeva"] . "</td>";
-                        echo "<td>" . $product["naziv_status"] . "</td>";
-                        echo "<td><button class='btn_p' name='{$product["zahtjev_id"]}' value='prihvati'>Prihvati</button>"
-                        . "<button class='btn_o' id='{$product["zahtjev_id"]}' name='{$product["zahtjev_id"]}' value='odbij'>Odbij</button></td>";
+                        echo "<td>" . $product["prijava_id"] . "</td>";
+                        echo "<td>" . $product["naslov"] . "</td>";
+                        echo "<td>" . $product["razlog"] . "</td>";
+                        echo "<td>" . $product["intelektualno_vlasnistvo_id"] . "</td>";
+                        echo "<td>" . $product["korisnik_id"] . "</td>";
+                        echo "<td><button class='btn_v' name='{$product["intelektualno_vlasnistvo_id"]}' value='vazece'>Vazece</button>"
+                        . "<button class='btn_o' id='{$product["intelektualno_vlasnistvo_id"]}' name='{$product["intelektualno_vlasnistvo_id"]}' value='odbijeno'>Odbij</button></td>";
                         echo "</tr>";
                     }
                     echo "</tbody>";
@@ -231,27 +193,23 @@ $veza->zatvoriDB();
             </div>
         </div>
         <script>
-            var allButtonsP = document.querySelectorAll(".btn_p");
-            var allButtonsO = document.querySelectorAll(".btn_o");
-            for (i = 0; i < allButtonsP.length; i++) {
-                allButtonsP[i].addEventListener("click", prihvati_odbij(allButtonsP[i].name, allButtonsP[i].value));
-            }
-            for (i = 0; i < allButtonsO.length; i++) {
-                allButtonsO[i].addEventListener("click", prihvati_odbij(allButtonsO[i].name, allButtonsO[i].value));
+            var allButtons = document.querySelectorAll(".btn_v ,.btn_o");
+            for (i = 0; i < allButtons.length; i++) {
+                allButtons[i].addEventListener("click", prihvati_odbij(allButtons[i].name, allButtons[i].value));
             }
             function prihvati_odbij(button_id, button_value) {
                 return function () {
                     $.ajax({
                         type: "GET",
-                        url: "../php/resolve_request.php",
+                        url: "../php/resolve_report.php",
                         data: {id: button_id, value: button_value},
                         success: function (result) {
                             if (result === "1") {
-                                alert("Zahtjev prihvacen!");
+                                alert("Vlasnistvo prihvaceno!");
                                 var row = document.getElementById(button_id).parentNode.parentNode;
                                 row.parentNode.removeChild(row);
                             } else if (result === "0") {
-                                alert("Zahtjev odbijen!");
+                                alert("Vlasnistvo odbijeno!");
                                 var row = document.getElementById(button_id).parentNode.parentNode;
                                 row.parentNode.removeChild(row);
                             }

@@ -249,7 +249,7 @@ $veza->zatvoriDB();
                             echo "<button class='btn_kupi' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Kupi</button>";
                         }
                     }
-                    if (isset($_SESSION["korisnik"]) && $product["korisnicko_ime"] != $_SESSION["korisnik"]) {
+                    if (isset($_SESSION["korisnik"]) && $product["korisnicko_ime"] != $_SESSION["korisnik"] && $product["naziv_status"] != "Prihvaceno") {
                         echo "<a href='forms/report_property.php?id={$product["intelektualno_vlasnistvo_id"]}'><button class='btn_prijavi'>Prijavi</button></a>";
                     }
                     echo "</div>";

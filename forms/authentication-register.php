@@ -54,6 +54,9 @@ if (isset($_POST["submit"])) {
         <link rel="stylesheet" href="../css/content.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <style media="screen">
             html,body,h1,h2,h3,h4 {
                 font-family:"Lato", sans-serif
@@ -199,7 +202,8 @@ if (isset($_POST["submit"])) {
                     <h3>Registracija</h3>
 
                     <label for="username">Username</label>
-                    <input type="text" placeholder="Email or Phone" id="username" name="username">
+                    <input type="text" placeholder="Email or Phone" id="username" name="username" onkeyup="postoji()">
+                    <label id="warning" style="display: none;">Korisnicko ime postoji!</label>
 
                     <label for="firstname">Firstname</label>
                     <input type="text" placeholder="Firstname" id="firstname" name="firstname">
@@ -216,13 +220,37 @@ if (isset($_POST["submit"])) {
                     <label for="confirm_password">Confirm password</label>
                     <input type="password" placeholder="Confirm password" id="confirm_password" name="confirm_password">
 
-                    <button name="submit">Registriraj se</button><br><br>
+                    <button name="submit" id="button_register">Registriraj se</button><br><br>
 
                     <a href="authentication-login.php">Logiraj se</a>
                 </form>
 
             </div>
 
+            <script>
+                function postoji() {
+                    var username = document.getElementById("username").value;
+                    $.ajax({
+                        type: "GET",
+                        url: "../php/resolve_report.php",
+                        data: {username: username},
+                        async: false,
+                        success: function (result) {
+                            if (result === "1") {
+                                document.getElementById("button_register").disabled = true;
+                                document.getElementById("warning").style.display = "initial";
+                                
+                            }else{
+                                document.getElementById("button_register").disabled = false;
+                                document.getElementById("warning").style.display = "none";
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            </script>
 
         </div>
     </body>

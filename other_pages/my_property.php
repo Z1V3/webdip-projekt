@@ -38,7 +38,7 @@ foreach ($placanja as $placanje) {
     }
 }
 
-$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE k.korisnik_id = '{$user_id}' AND s.status_id != '5'";
+$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE k.korisnik_id = '{$user_id}' AND s.status_id != '5' AND s.status_id != '2'";
 $rezultat = $veza->selectDB($upit);
 if ($rezultat->num_rows > 0) {
     while ($row = $rezultat->fetch_assoc()) {
@@ -152,6 +152,7 @@ $veza->zatvoriDB();
                 top: 0%;
             }
             .btn{
+                border-radius: 10px;
                 padding: 10px;
                 padding-left: 30px;
                 padding-right: 30px;
@@ -201,6 +202,8 @@ $veza->zatvoriDB();
                             echo "<td><button class='btn' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Plati</button></td>";
                         } else if ($product["naziv_status"] == "Provjera") {
                             echo "<td>Vlasništvo u provjeri</td>";
+                        } else if ($product["naziv_status"] == "Odbijeno") {
+                            echo "<td>Vlasnistvo odbijeno</td>";
                         } else {
                             echo "<td>Placeno</td>";
                         }

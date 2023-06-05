@@ -39,12 +39,18 @@ if ($_SESSION["uloga"] == "2") {
 if ($_SESSION["uloga"] > "2") {
     $meni .= "<div class=\"col s3\">
                     <a href=\"$putanja/other_pages/all_requests.php\" class=\"button block\">Pregled zahtjeva</a>
+                </div>
+                <div class=\"col s3\">
+                   <a href=\"$putanja/other_pages/all_reports.php\" class=\"button block\">Prijave</a>
+                </div>
+                <div class = \"col s3\">
+                    <a href=\"#contact\" class=\"button block\">Statistika</a>
                 </div>";
 }
 
-if ($_SESSION["uloga"] > "2") {
+if ($_SESSION["uloga"] > "3") {
     $meni .= "<div class=\"col s3\">
-                    <a href=\"#contact\" class=\"button block\">Statistika</a>
+                   <a href=\"$putanja/other_pages/all_types.php\" class=\"button block\">Vrste vlasnistva</a>
                 </div>
                 ";
 }
