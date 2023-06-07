@@ -158,13 +158,6 @@ $veza->zatvoriDB();
                 background-color:#f58792!important
             }
 
-            .search{
-                background-color: inherit;
-                position: absolute;
-                top: 23%;
-                left: 70%;
-                color: white;
-            }
             .background{
                 position: fixed;
                 z-index: -1;
@@ -196,6 +189,192 @@ $veza->zatvoriDB();
                 background-color: gray;
                 color: white;
             }
+            
+            
+            .form {
+                position: absolute;
+                top: 25%;
+                left: 81%;
+                z-index: 0;
+                background-color: white;
+                box-shadow: 20px 20px #525E6C;
+                border-radius: 25px;
+                box-sizing: border-box;
+                height: 215px;
+                padding: 20px;
+                width: 420px;
+            }
+
+            .title {
+                color: black;
+                font-size: 36px;
+                font-weight: 600;
+                margin-top: 10px;
+            }
+
+            .subtitle {
+                color: black;
+                font-size: 16px;
+                font-weight: 600;
+                margin-top: 10px;
+            }
+
+            .input-container {
+                height: 50px;
+                position: relative;
+                width: 100%;
+            }
+
+            .inpu1 {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .input3 {
+                margin-top: 40px;
+                margin-bottom: 180px;
+            }
+
+            .input {
+                background-color: lightgray;
+                border-radius: 12px;
+                border: 0;
+                box-sizing: border-box;
+                color: #eee;
+                font-size: 18px;
+                height: 100%;
+                outline: 0;
+                padding: 4px 20px 0;
+                width: 100%;
+            }
+
+            .cut {
+                background-color: white;
+                border-radius: 10px;
+                height: 20px;
+                left: 20px;
+                position: absolute;
+                top: -20px;
+                transform: translateY(0);
+                transition: transform 200ms;
+                width: 76px;
+            }
+
+
+            .input:focus ~ .cut,
+            .input:not(:placeholder-shown) ~ .cut {
+                transform: translateY(8px);
+            }
+            .textarea:focus ~ .cut,
+            .textarea:not(:placeholder-shown) ~ .cut {
+                transform: translateY(8px);
+            }
+
+            .placeholder {
+                color: #65657b;
+                left: 20px;
+                line-height: 14px;
+                pointer-events: none;
+                position: absolute;
+                transform-origin: 0 50%;
+                transition: transform 200ms, color 200ms;
+                top: 20px;
+            }
+
+            .input:focus ~ .placeholder,
+            .input:not(:placeholder-shown) ~ .placeholder {
+                transform: translateY(-30px) translateX(10px) scale(0.75);
+            }
+            .textarea:focus ~ .placeholder,
+            .textarea:not(:placeholder-shown) ~ .placeholder {
+                transform: translateY(-30px) translateX(10px) scale(0.75);
+            }
+
+            .submit {
+                background-color: #E94555;
+                border-radius: 12px;
+                border: 0;
+                box-sizing: border-box;
+                color: #eee;
+                cursor: pointer;
+                font-size: 18px;
+                height: 50px;
+                margin-top: 0px;
+                text-align: center;
+                width: 20%;
+            }
+
+            .submit:hover {
+                background-color: #f58792;
+            }
+
+            .textarea{
+                background-color: lightgray;
+                border-radius: 12px;
+                border: 0;
+                box-sizing: border-box;
+                color: #eee;
+                font-size: 18px;
+                height: 200px;
+                outline: 0;
+                padding: 4px 20px 0;
+                width: 100%;
+            }
+
+            .selectdiv {
+                position: relative;
+                /*Don't really need this just for demo styling*/
+
+                min-width: 200px;
+                margin: 50px 33%;
+            }
+
+            /* IE11 hide native button (thanks Matt!) */
+            select::-ms-expand {
+                display: none;
+            }
+
+            .selectdiv:after {
+                content: '<>';
+                font: 17px "Consolas", monospace;
+                color: #333;
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -ms-transform: rotate(90deg);
+                transform: rotate(90deg);
+                right: 11px;
+                /*Adjust for position however you want*/
+
+                top: 18px;
+                padding: 0 0 2px;
+                border-bottom: 1px solid #999;
+                /*left line */
+
+                position: absolute;
+                pointer-events: none;
+            }
+
+            .selectdiv select {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                /* Add some styling */
+
+                width: 100%;
+                max-width: 320px;
+                height: 50px;
+                margin: 5px 0px;
+                padding: 0px 24px;
+                font-size: 16px;
+                line-height: 1.75;
+                color: #333;
+                background-color: #ffffff;
+                background-image: none;
+                border: 1px solid #cccccc;
+                -ms-word-break: normal;
+                word-break: normal;
+            }
+
         </style>
     </head>
     <body>
@@ -213,12 +392,16 @@ $veza->zatvoriDB();
                 <h1><b>Intelektualna vlasništva</b></h1>
             </div>
 
-            <form  class="search" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
-
-                <label for="search" style="font-size: 30px;">Pretraživanje: </label>
-                <input type="text" placeholder="Pretraži ovdje" id="search" name="search">
-                <button name="submit">Pretrazi</button>
+            <form class="form" novalidate method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
+                <div class="title">Pretrazi vlasnistvo</div>
+                <div class="input-container inpu1">
+                    <input id="search" class="input" type="text" name="search" placeholder=" " />
+                    <div class="cut"></div>
+                    <label for="search" class="placeholder">Ovdje upisi ime</label>
+                </div>
+                <button type="text" class="submit" name="submit">Pretrazi</button>
             </form>
+
             <?php
             if (!empty($data)) {
                 foreach ($data as $product) {

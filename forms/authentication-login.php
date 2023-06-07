@@ -87,6 +87,9 @@ if (isset($_POST["submit"])) {
         <link rel="stylesheet" href="../css/content.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
         <style media="screen">
             html,body,h1,h2,h3,h4 {
                 font-family:"Lato", sans-serif
@@ -241,12 +244,41 @@ if (isset($_POST["submit"])) {
 
                     <p><?php echo $poruka; ?></p>
 
-                    <a href="authentication-register.php">Registriraj se</a>
+                    <a href="authentication-register.php">Registriraj se</a><br>
+                    <u><a onclick="forgot()">Zaboravljena lozinka</a></u>
                 </form>
 
             </div>
 
 
         </div>
+        <script>
+            function forgot() {
+                var username = document.getElementById("username").value;
+                if (username.length > 0) {
+                    $.ajax({
+                        type: "GET",
+                        url: "../php/resolve_report.php",
+                        data: {username_zl: username},
+                        async: false,
+                        success: function (result) {
+                            if (result === "1") {
+                                alert("Poslana je nova lozinka na vas email!");
+
+                            } else if (result === "-1") {
+                                alert("Korisnik s tim korisnickim imenom ne postoji!");
+                            } else if (result === "0") {
+                                alert("Greska!");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+                }else{
+                    alert("Unesite korisnicko ime i ponovno pritisnite ovaj gumb!");
+                }
+            }
+        </script>
     </body>
 </html>

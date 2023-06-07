@@ -1,6 +1,7 @@
 <?php
 
-$meni = "<div class=\"top\">
+$meni = "<a href=\"$putanja/other_pages/logs.php\"><img src='$putanja/multimedia/book.png' alt='logs' class='logs'></a>
+    <div class=\"top\">
             <div class=\"row large light-grey\">
                 <div class=\"col s3\">
                     <a href=\"$putanja/index.php\" class=\"button block\">Popis zahtjeva</a>

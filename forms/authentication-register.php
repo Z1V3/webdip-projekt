@@ -19,15 +19,31 @@ if (isset($_POST["submit"])) {
 
     $regex = "/^[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+[\w]+@+[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+$/";
     if (!preg_match($regex, $email)) {
-        $error .= "Email polje nije pravilno popunjeno!";
+        $error = "Email polje nije pravilno popunjeno!";
     }
 
-    $regex = '/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[*.!@$%^&(){}[\]:;<>,.?/~_+\-=|\]).{8,32}$/';
+    $regex = '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/';
     if (!preg_match($regex, $password)) {
-        $error .= "Lozinka mora sadržavati barem jedan broj, jedno veliko i jedno malo slovo te specijalan znak i u rangu je od 8 do 32 znakova!";
+        $error = "Lozinka mora sadržavati barem jedan broj, jedno veliko i jedno malo slovo te specijalan znak i u rangu je od 8 do 25 znakova!";
     }
 
-    if (empty($greska)) {
+    $veza = new Baza();
+    $veza->spojiDB();
+
+    $query = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$username}'";
+    $rezultat = $veza->selectDB($query);
+    if ($rezultat->num_rows > 0) {
+        $error = "Korisnik postoji";
+    }
+    
+    $query = "SELECT * FROM korisnik WHERE email = '{$email}'";
+    $rezultat = $veza->selectDB($query);
+    if ($rezultat->num_rows > 0) {
+        $error = "Korisnik postoji";
+    }
+    
+    $veza->zatvoriDB();
+    if (empty($error)) {
 
         $veza = new Baza();
         $veza->spojiDB();
@@ -119,7 +135,7 @@ if (isset($_POST["submit"])) {
                 bottom: -500px;
             }
             form{
-                height: 970px;
+                height: 1170px;
                 width: 600px;
                 background-color: rgba(255,255,255,0.13);
                 position: absolute;
@@ -198,7 +214,7 @@ if (isset($_POST["submit"])) {
                     <div class="shape"></div>
                     <div class="shape"></div>
                 </div>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate>
+                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>" novalidate onsubmit="provjeri()">
                     <h3>Registracija</h3>
 
                     <label for="username">Username</label>
@@ -207,18 +223,23 @@ if (isset($_POST["submit"])) {
 
                     <label for="firstname">Firstname</label>
                     <input type="text" placeholder="Firstname" id="firstname" name="firstname">
+                    <label id="warning2" style="display: none;">Ime mora biti u rangu od 4 do 25 znaka i ne smije sadrzavati brojke/specijalne znakove!</label>
 
                     <label for="lastname">Lastname</label>
                     <input type="text" placeholder="Lastname" id="lastname" name="lastname">
+                    <label id="warning3" style="display: none;">Prezime mora biti u rangu od 4 do 25 znaka i ne smije sadrzavati brojke/specijalne znakove!</label>
 
                     <label for="email">Email</label>
                     <input type="email" placeholder="Email" id="email" name="email">
+                    <label id="warning4" style="display: none;">Nepravilan email!</label>
 
                     <label for="password">Password</label>
                     <input type="password" placeholder="Password" id="password" name="password">
+                    <label id="warning5" style="display: none;">Lozinka mora sadrzavati sadrzavati: 1 malo slovo, 1 veliko slovo, 1 specijalan znak, 1 broj i u rangu je 8 do 25 znakova!</label>
 
                     <label for="confirm_password">Confirm password</label>
                     <input type="password" placeholder="Confirm password" id="confirm_password" name="confirm_password">
+                    <label id="warning6" style="display: none;">Lozinke se moraju podudarati!</label>
 
                     <button name="submit" id="button_register">Registriraj se</button><br><br>
 
@@ -228,6 +249,55 @@ if (isset($_POST["submit"])) {
             </div>
 
             <script>
+
+                function provjeri() {
+                    var greska = false;
+                    const regexFirstname = new RegExp("\b[A-Za-z]{3,25}\b");
+                    var ok = true;
+                    ok = regexFirstname.test(document.getElementById("firstname").value);
+                    if (!ok) {
+                        greska = true;
+                        document.getElementById("warning2").style.display = "initial";
+                    } else {
+                        document.getElementById("warning2").style.display = "none";
+                    }
+                    ok = true;
+                    ok = regexFirstname.test(document.getElementById("lastname").value);
+                    if (!ok) {
+                        greska = true;
+                        document.getElementById("warning3").style.display = "initial";
+                    } else {
+                        document.getElementById("warning3").style.display = "none";
+                    }
+                    ok = true;
+                    const regexEmail = /^[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+[\w]+@+[^!@#$%^&*()_+\-=\[\]{};\'\":\\|,.<>\/?]+[\w.]+$/;
+                    ok = regexEmail.test(document.getElementById("email"));
+                    if (!ok) {
+                        greska = true;
+                        document.getElementById("warning4").style.display = "initial";
+                    } else {
+                        document.getElementById("warning4").style.display = "none";
+                    }
+                    ok = true;
+                    const regexPass = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$");
+                    ok = regexPass.test(document.getElementById("password"));
+                    if (!ok) {
+                        greska = true;
+                        document.getElementById("warning5").style.display = "initial";
+                    } else {
+                        document.getElementById("warning5").style.display = "none";
+                    }
+                    if (document.getElementById("password").value !== document.getElementById("confirm_password")) {
+                        greska = true;
+                        document.getElementById("warning6").style.display = "initial";
+                    } else {
+                        document.getElementById("warning6").style.display = "none";
+                    }
+                    if (greska) {
+                        event.preventDefault();
+                    }
+                }
+
                 function postoji() {
                     var username = document.getElementById("username").value;
                     $.ajax({
@@ -239,8 +309,8 @@ if (isset($_POST["submit"])) {
                             if (result === "1") {
                                 document.getElementById("button_register").disabled = true;
                                 document.getElementById("warning").style.display = "initial";
-                                
-                            }else{
+
+                            } else {
                                 document.getElementById("button_register").disabled = false;
                                 document.getElementById("warning").style.display = "none";
                             }
