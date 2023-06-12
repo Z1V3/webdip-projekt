@@ -12,7 +12,7 @@ $veza->spojiDB();
 $data = array();
 
 if (isset($_POST["submit_create"]) && $_POST["id"] != "") {
-    $upit = "SELECT d.zapis_id, d.opis, d.radnja, d.datum_vrijeme_zapisa, d.tip_zapisa_id, tz.tip_zapisa_id, d.korisnik_id, k.korisnik_id, tz.naziv_tip_zapisa, k.korisnicko_ime FROM dnevnik AS d JOIN tip_zapisa AS tz ON d.tip_zapisa_id = tz.tip_zapisa_id JOIN korisnik AS k ON d.korisnik_id = k.korisnik_id WHERE d.zapis_id = '{$_POST["id"]}'";
+    $upit = "SELECT d.zapis_id, d.opis, d.datum_vrijeme_zapisa, d.tip_zapisa_id, tz.tip_zapisa_id, d.korisnik_id, k.korisnik_id, tz.naziv_tip_zapisa, k.korisnicko_ime FROM dnevnik AS d JOIN tip_zapisa AS tz ON d.tip_zapisa_id = tz.tip_zapisa_id JOIN korisnik AS k ON d.korisnik_id = k.korisnik_id WHERE d.zapis_id = '{$_POST["id"]}'";
     $rezultat = $veza->selectDB($upit);
 
     if ($rezultat->num_rows > 0) {
@@ -21,7 +21,7 @@ if (isset($_POST["submit_create"]) && $_POST["id"] != "") {
         }
     }
 } else {
-    $upit = "SELECT d.zapis_id, d.opis, d.radnja, d.datum_vrijeme_zapisa, d.tip_zapisa_id, tz.tip_zapisa_id, d.korisnik_id, k.korisnik_id, tz.naziv_tip_zapisa, k.korisnicko_ime FROM dnevnik AS d JOIN tip_zapisa AS tz ON d.tip_zapisa_id = tz.tip_zapisa_id JOIN korisnik AS k ON d.korisnik_id = k.korisnik_id";
+    $upit = "SELECT d.zapis_id, d.opis, d.datum_vrijeme_zapisa, d.tip_zapisa_id, tz.tip_zapisa_id, d.korisnik_id, k.korisnik_id, tz.naziv_tip_zapisa, k.korisnicko_ime FROM dnevnik AS d JOIN tip_zapisa AS tz ON d.tip_zapisa_id = tz.tip_zapisa_id JOIN korisnik AS k ON d.korisnik_id = k.korisnik_id";
     $rezultat = $veza->selectDB($upit);
 
     if ($rezultat->num_rows > 0) {
@@ -60,7 +60,7 @@ $veza->zatvoriDB();
                 margin: 0;
                 background: #1e202b;
                 font-family: sans-serif;
-                font-weight: 100;
+                ;
             }
 
             .container {
@@ -380,7 +380,6 @@ $veza->zatvoriDB();
                     echo "<tr>";
                     echo "<th>ID</th>";
                     echo "<th>Opis</th>";
-                    echo "<th>Radnja</th>";
                     echo "<th>Datum i vrijeme zapisa</th>";
                     echo "<th>Tip zapisa</th>";
                     echo "<th>Korisnik</th>";
@@ -389,7 +388,6 @@ $veza->zatvoriDB();
                         echo "<tr>";
                         echo "<td>" . $product["zapis_id"] . "</td>";
                         echo "<td>" . $product["opis"] . "</td>";
-                        echo "<td>" . $product["radnja"] . "</td>";
                         echo "<td>" . $product["datum_vrijeme_zapisa"] . "</td>";
                         echo "<td>" . $product["naziv_tip_zapisa"] . "</td>";
                         echo "<td>" . $product["korisnicko_ime"] . "</td>";

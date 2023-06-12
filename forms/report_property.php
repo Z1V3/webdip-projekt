@@ -22,6 +22,7 @@ if (isset($_POST["submit"])) {
         $upit = "INSERT INTO prijava (naslov, razlog, intelektualno_vlasnistvo_id, korisnik_id) VALUES ('{$_POST["name"]}', '{$_POST["description"]}', '{$_POST["id"]}', '{$user_id}')";
         if ($veza->selectDB($upit)) {
             $message = "Prijava uspjesno poslana!";
+            zapisiDnevnik(6, $user_id, $_POST["id"]);
             $veza->zatvoriDB();
             header("Location: ../index.php?message=report_uspjeh");
             exit();

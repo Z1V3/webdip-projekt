@@ -35,13 +35,13 @@ if (isset($_POST["submit"])) {
     if ($rezultat->num_rows > 0) {
         $error = "Korisnik postoji";
     }
-    
+
     $query = "SELECT * FROM korisnik WHERE email = '{$email}'";
     $rezultat = $veza->selectDB($query);
     if ($rezultat->num_rows > 0) {
         $error = "Korisnik postoji";
     }
-    
+
     $veza->zatvoriDB();
     if (empty($error)) {
 
@@ -53,6 +53,8 @@ if (isset($_POST["submit"])) {
         $query = "INSERT INTO korisnik (korisnicko_ime, ime, prezime, email, lozinka, lozinka_sha256, uvjeti, broj_neuspjesnih_prijava, blokiran, aktiviran, tip_korisnika_id) VALUES ('{$username}','{$firstname}','{$lastname}','{$email}','{$password}','{$password_sha256}','0','0','0','0','2')";
 
         $result = $veza->selectDB($query);
+
+        zapisiDnevnik(4, $kod_id, $username);
 
         $veza->zatvoriDB();
 

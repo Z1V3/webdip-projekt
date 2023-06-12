@@ -76,18 +76,18 @@ $veza->zatvoriDB();
                 margin: 0;
                 background: #1e202b;
                 font-family: sans-serif;
-                font-weight: 100;
+                ;
             }
 
             .container {
                 position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+                top: 30%;
+                left: 20%;
             }
 
             table {
-                width: 800px;
+                height: 100%;
+                width: 100%;
                 border-collapse: collapse;
                 overflow: hidden;
                 box-shadow: 0 0 20px rgba(0,0,0,0.1);

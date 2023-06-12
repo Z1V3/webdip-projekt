@@ -432,3 +432,11 @@ a{
     width: 110px;
 }
 
+.documentation{
+    position: absolute;
+    z-index: 2;
+    top: 0%;
+    right: 0%;
+    width: 110px;
+}
+

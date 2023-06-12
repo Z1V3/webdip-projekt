@@ -1,4 +1,10 @@
 <?php
+/*
+  if (!isset($_SERVER['HTTPS'])) {
+  $url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+  header("Location: " . $url);}
+ */
+
 $putanja = dirname(dirname($_SERVER['REQUEST_URI']));
 
 include "../php/functions.php";
@@ -27,8 +33,10 @@ if (isset($_POST["submit"])) {
 
         $autenticiran = false;
         $tip;
+        $kod_id;
         while ($red = mysqli_fetch_array($rezultat)) {
             if ($red) {
+                $kod_id = $red["korisnik_id"];
                 $autenticiran = true;
                 $tip = $red["tip_korisnika_id"];
                 $email = $red["email"];
@@ -41,6 +49,10 @@ if (isset($_POST["submit"])) {
             $poruka = 'Uspješna prijava!';
             $upit = "UPDATE korisnik SET broj_neuspjesnih_prijava = 0 WHERE korisnicko_ime = '{$username}'";
             $veza->selectDB($upit);
+
+            
+            zapisiDnevnik(3, $kod_id, $username);
+
             //Create cookie
             setcookie("autenticiran", $username, false, '/', false);
 
@@ -275,7 +287,7 @@ if (isset($_POST["submit"])) {
                             console.error('Error:', error);
                         }
                     });
-                }else{
+                } else {
                     alert("Unesite korisnicko ime i ponovno pritisnite ovaj gumb!");
                 }
             }

@@ -24,12 +24,12 @@ if (isset($_GET["id_obrisi"])) {
     }
 }
 
-if (isset($_GET["username"])){
+if (isset($_GET["username"])) {
     $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_GET["username"]}'";
     $rezultat = $veza->selectDB($upit);
     if ($rezultat->num_rows > 0) {
         echo "1";
-    }else{
+    } else {
         echo "0";
     }
 }
@@ -38,6 +38,12 @@ if (isset($_GET["username_zl"])) {
     $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_GET["username_zl"]}'";
     $rezultat = $veza->selectDB($upit);
     if ($rezultat->num_rows > 0) {
+        $kod_id;
+        while ($red = mysqli_fetch_array($rezultat)) {
+            if ($red) {
+                $kod_id = $red["korisnik_id"];
+            }
+        }
         $lowercaseAlphabet = 'abcdefghijklmnopqrstuvwxyz';
         $uppercaseAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $numbers = '0123456789';
@@ -61,10 +67,11 @@ if (isset($_GET["username_zl"])) {
         $novaLoz_sha256 = hash("sha256", $novaLoz);
 
         $upit = "UPDATE korisnik SET lozinka = '{$novaLoz}', lozinka_sha256 = '{$novaLoz_sha256}' WHERE korisnicko_ime ='{$_GET["username_zl"]}'";
-        
+
         if ($veza->selectDB($upit)) {
+            zapisiDnevnik(7, $kod_id, $_SESSION["korisnik"]);
             $mail_to = 'andrijazifko@gmail.com';    //trenutno se salje ovom mailu, ako budem htel drugi mail onda SELECT u bazu $_GET["username"] da se nade o kome je rijec i uzme mu se mail i onda se tom posalje
-            $mail_from = "qick319@gmail.com";
+            $mail_from = "azivko@student.foi.hr";
             $mail_subject = '[WebDiP] Slanje maila: Promjena lozinke';
             $mail_body = "Nova lozinka je: {$novaLoz}";
 
@@ -73,10 +80,9 @@ if (isset($_GET["username_zl"])) {
         } else {
             echo "0";
         }
-    }else{
+    } else {
         echo "-1";
     }
-    
 }
 
 $veza->zatvoriDB();

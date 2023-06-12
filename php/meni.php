@@ -1,16 +1,20 @@
 <?php
-
-$meni = "<a href=\"$putanja/other_pages/logs.php\"><img src='$putanja/multimedia/book.png' alt='logs' class='logs'></a>
-    <div class=\"top\">
+if($_SESSION["uloga"] > 3){
+$meni = "<a href=\"$putanja/other_pages/logs.php\"><img src='$putanja/multimedia/book.png' alt='logs' class='logs'></a>"
+        . "<a href=\"$putanja/dokumentacija.php\"><img src='$putanja/multimedia/document.png' alt='documentation' class='documentation'></a>";
+}else{
+    $meni = "";
+}
+$meni .= "<div class=\"top\">
             <div class=\"row large light-grey\">
                 <div class=\"col s3\">
                     <a href=\"$putanja/index.php\" class=\"button block\">Popis zahtjeva</a>
                 </div>
                 <div class=\"col s3\">
-                    <a href=\"#contact\" class=\"button block\">Popis vlasnika</a>
+                    <a href=\"$putanja/other_pages/all_users.php\" class=\"button block\">Popis vlasnika</a>
                 </div>
                 <div class=\"col s3\">
-                    <a href=\"#plans\" class=\"button block\">O autoru</a>
+                    <a href=\"$putanja/o_autoru.php\" class=\"button block\">O autoru</a>
                 </div>
                     ";
 if (!isset($_SESSION["uloga"])) {

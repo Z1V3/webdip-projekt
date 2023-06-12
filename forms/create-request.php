@@ -37,6 +37,7 @@ if (isset($_POST["submit"])) {
 
         $upit = "INSERT INTO zahtjev (opis, tip_zahtjeva_id, korisnik_id, status_id, tip_intelektualnog_vlasnistva_id) VALUES ('{$name}:_:{$description}:_:{$targetFileName}:_:{$price}:_:{$type}:_:{$korisnik_id}', 1, {$korisnik_id}, 3, {$type})";
         if ($veza->selectDB($upit)) {
+            zapisiDnevnik(8, $korisnik_id, $username);
             header("Location: ../index.php?message=kreiranje_uspjeh");
         }
         $veza->zatvoriDB();

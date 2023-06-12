@@ -11,38 +11,39 @@ $veza->spojiDB();
 
 $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_SESSION["korisnik"]}'";
 $rezultat = $veza->selectDB($upit);
-$user_id;
+$korisnik_id;
 while ($red = mysqli_fetch_array($rezultat)) {
     if ($red) {
-        $user_id = $red["korisnik_id"];
+        $korisnik_id = $red["korisnik_id"];
     }
 }
 
-$upit = "SELECT * FROM placanje WHERE korisnik_id = '{$user_id}'";
+if (isset($_GET["blokiraj"])) {
+    zapisiDnevnik(10, $korisnik_id, $_GET["blokiraj"]);
+    $upit = "UPDATE korisnik SET blokiran = 1 WHERE korisnik_id = {$_GET["blokiraj"]}";
+    $rezultat = $veza->selectDB($upit);
+}
+if (isset($_GET["odblokiraj"])) {
+    zapisiDnevnik(11, $korisnik_id, $_GET["odblokiraj"]);
+    $upit = "UPDATE korisnik SET blokiran = 0 WHERE korisnik_id = {$_GET["odblokiraj"]}";
+    $rezultat = $veza->selectDB($upit);
+}
+if (isset($_GET["moderiraj"])) {
+    zapisiDnevnik(9, $korisnik_id, $_GET["moderiraj"]);
+    $upit = "UPDATE korisnik SET tip_korisnika_id = 3 WHERE korisnik_id = {$_GET["moderiraj"]}";
+    $rezultat = $veza->selectDB($upit);
+}
+if (isset($_GET["demoderiraj"])) {
+    $upit = "UPDATE korisnik SET tip_korisnika_id = 2 WHERE korisnik_id = {$_GET["demoderiraj"]}";
+    $rezultat = $veza->selectDB($upit);
+}
+$upit = "SELECT * FROM korisnik";
 $rezultat = $veza->selectDB($upit);
+
 $data = array();
-$placanja = array();
 if ($rezultat->num_rows > 0) {
     while ($red = mysqli_fetch_array($rezultat)) {
-        $placanja[] = $red["intelektualno_vlasnistvo_id"];
-    }
-}
-
-foreach ($placanja as $placanje) {
-    $upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE iv.intelektualno_vlasnistvo_id = '{$placanje}'";
-    $rezultat = $veza->selectDB($upit);
-    if ($rezultat->num_rows > 0) {
-        while ($row = $rezultat->fetch_assoc()) {
-            $data[] = $row;
-        }
-    }
-}
-
-$upit = "SELECT iv.intelektualno_vlasnistvo_id, iv.naziv_intelektualno_vlasnistvo, iv.opis_intelektualno_vlasnistvo, iv.slika, iv.cijena_koristenja, k.korisnicko_ime, tiv.naziv_tip_intelektualno_vlasnistvo, s.naziv_status FROM intelektualno_vlasnistvo AS iv JOIN korisnik  AS k ON iv.korisnik_id = k.korisnik_id JOIN tip_intelektualnog_vlasnistva AS tiv ON iv.tip_intelektualnog_vlasnistva_id = tiv.tip_intelektualnog_vlasnistva_id JOIN status AS s ON iv.status_id = s.status_id WHERE k.korisnik_id = '{$user_id}' AND s.status_id != '5' AND s.status_id != '2'";
-$rezultat = $veza->selectDB($upit);
-if ($rezultat->num_rows > 0) {
-    while ($row = $rezultat->fetch_assoc()) {
-        $data[] = $row;
+        $data[] = $red;
     }
 }
 
@@ -74,7 +75,7 @@ $veza->zatvoriDB();
                 margin: 0;
                 background: #1e202b;
                 font-family: sans-serif;
-                ;
+
             }
 
             .container {
@@ -151,12 +152,17 @@ $veza->zatvoriDB();
                 left: 0%;
                 top: 0%;
             }
-            .btn{
+            .btn_b{
                 border-radius: 10px;
-                padding: 10px;
-                padding-left: 30px;
-                padding-right: 30px;
+                float: right;
+                font-family:"Bahnschrift";
+                width: 100px;
+                height: 30px;
+                font-weight: bold;
+                background-color: white;
+                margin-bottom: 5px;
             }
+
         </style>
     </head>
     <body>
@@ -177,35 +183,52 @@ $veza->zatvoriDB();
 
                 <?php
                 if (!empty($data)) {
-                    echo "<table>";
+                    echo "<table id='tablica'>";
                     echo "<thead>";
                     echo "<tr>";
-                    echo "<th>ID</th>";
-                    echo "<th>Naziv</th>";
-                    echo "<th>Tip vlasnistva</th>";
-                    echo "<th>Opis</th>";
-                    echo "<th>Slika</th>";
-                    echo "<th>Cijena koristenja</th>";
-                    echo "<th>Vlasnik</th>";
-                    echo "<th>Placanje</th>";
+                    if ($_SESSION["uloga"] > 3) {
+                        echo "<th>ID</th>";
+                    }
+                    echo "<th>Korisnicko ime</th>";
+                    echo "<th>Ime</th>";
+                    echo "<th>Prezime</th>";
+                    if ($_SESSION["uloga"] > 3) {
+                        echo "<th>Email</th>";
+                        echo "<th>Uvjeti</th>";
+                        echo "<th>Broj neuspjesnih prijava</th>";
+                        echo "<th>Blokiran</th>";
+                        echo "<th>Aktiviran</th>";
+                        echo "<th>Tip korisnika</th>";
+                        echo "<th>Opcije</th>";
+                    }
                     echo "<tbody>";
                     foreach ($data as $product) {
                         echo "<tr>";
-                        echo "<td>" . $product["intelektualno_vlasnistvo_id"] . "</td>";
-                        echo "<td>" . $product["naziv_intelektualno_vlasnistvo"] . "</td>";
-                        echo "<td>" . $product["naziv_tip_intelektualno_vlasnistvo"] . "</td>";
-                        echo "<td>" . $product["opis_intelektualno_vlasnistvo"] . "</td>";
-                        echo "<td>" . "<img src=\"../multimedia/{$product["slika"]}\" alt='{$product["slika"]}' width=50px>" . "</td>";
-                        echo "<td>" . $product["cijena_koristenja"] . "$</td>";
+                        if ($_SESSION["uloga"] > 3) {
+                            echo "<td>" . $product["korisnik_id"] . "</td>";
+                        }
                         echo "<td>" . $product["korisnicko_ime"] . "</td>";
-                        if ($product["naziv_status"] == "Prihvaceno") {
-                            echo "<td><button class='btn' name='{$product["intelektualno_vlasnistvo_id"]}' value='{$product["cijena_koristenja"]}'>Plati</button></td>";
-                        } else if ($product["naziv_status"] == "Provjera") {
-                            echo "<td>Vlasništvo u provjeri</td>";
-                        } else if ($product["naziv_status"] == "Odbijeno") {
-                            echo "<td>Vlasnistvo odbijeno</td>";
+                        echo "<td>" . $product["ime"] . "</td>";
+                        echo "<td>" . $product["prezime"] . "</td>";
+                        if ($_SESSION["uloga"] > 3) {
+                            echo "<td>" . $product["email"] . "</td>";
+                            echo "<td>" . $product["uvjeti"] . "</td>";
+                            echo "<td>" . $product["broj_neuspjesnih_prijava"] . "</td>";
+                            echo "<td>" . $product["blokiran"] . "</td>";
+                            echo "<td>" . $product["aktiviran"] . "</td>";
+                            echo "<td>" . $product["tip_korisnika_id"] . "</td>";
+                        }
+                        if ($product["blokiran"] == "0") {
+                            echo "<td><a href='" . $_SERVER["PHP_SELF"] . "?blokiraj=" . $product["korisnik_id"] . "'><button class='btn_b' id='{$product["korisnik_id"]}'>Blokiraj</button></a>";
+                        } else if ($product["blokiran"] == "1") {
+                            echo "<td><a href='" . $_SERVER["PHP_SELF"] . "?odblokiraj=" . $product["korisnik_id"] . "'><button class='btn_b' id='{$product["korisnik_id"]}'>Odblokiraj</button></a>";
+                        }
+                        if ($product["tip_korisnika_id"] != "3" && $product["tip_korisnika_id"] != "4") {
+                            echo "<a href='" . $_SERVER["PHP_SELF"] . "?moderiraj=" . $product["korisnik_id"] . "'><button class='btn_b' id='{$product["korisnik_id"]}'>Moderiraj</button></a>";
+                        } else if ($product["tip_korisnika_id"] == "3") {
+                            echo "<a href='" . $_SERVER["PHP_SELF"] . "?demoderiraj=" . $product["korisnik_id"] . "'><button class='btn_b' id='{$product["korisnik_id"]}'>Demoderiraj</button></td></a>";
                         } else {
-                            echo "<td>Placeno</td>";
+                            echo "</td>";
                         }
                         echo "</tr>";
                     }
@@ -216,28 +239,10 @@ $veza->zatvoriDB();
                 }
                 ?>
             </div>
+
         </div>
         <script>
-            var allButtons = document.querySelectorAll(".btn");
-            for (i = 0; i < allButtons.length; i++) {
-                allButtons[i].addEventListener("click", plati(allButtons[i].name, allButtons[i].value));
-            }
-            function plati(property_id, property_value) {
-                return function () {
-                    $.ajax({
-                        type: "GET",
-                        url: "../php/payment.php",
-                        data: {property_id: property_id, value: property_value},
-                        success: function (result) {
-                            console.log(result);
-                            $("[name='" + property_id + "']").remove();
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error:', error);
-                        }
-                    });
-                };
-            }
+
         </script>
     </body>
 </html>

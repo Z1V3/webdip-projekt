@@ -10,13 +10,15 @@ if (!isset($_SESSION["uloga"])) {
     $veza = new Baza();
     $veza->spojiDB();
 
-    $upit = "SELECT kod_id FROM korisnik WHERE korisnicko_ime = '{$_GET["username"]}'";
+    $upit = "SELECT * FROM korisnik WHERE korisnicko_ime = '{$_GET["username"]}'";
     $rezultat = $veza->selectDB($upit);
 
     $kod_id;
+    $email;
     while ($red = mysqli_fetch_array($rezultat)) {
         if ($red) {
             $kod_id = $red["kod_id"];
+            $email = $red["email"];
         }
     }
 
@@ -60,7 +62,10 @@ if (!isset($_SESSION["uloga"])) {
                     $upit = "UPDATE korisnik SET aktiviran = 1 WHERE korisnicko_ime = '{$_GET["username"]}'";
                     $rezultat = $veza->selectDB($upit);
                     $veza->zatvoriDB();
-
+                   
+                    
+                    zapisiDnevnik(5, $kod_id, $_GET["username"]);
+                    
                     setcookie("autenticiran", $_GET["username"], false, '/', false);
 
                     Sesija::kreirajKorisnika($_GET["username"], 2);
@@ -88,8 +93,8 @@ if (!isset($_SESSION["uloga"])) {
             $upit = "UPDATE korisnik SET kod_id = '{$kod_id}' WHERE korisnicko_ime = '{$_GET["username"]}'";
             $rezultat = $veza->selectDB($upit);
 
-            $mail_to = 'andrijazifko@gmail.com';    //trenutno se salje ovom mailu, ako budem htel drugi mail onda SELECT u bazu $_GET["username"] da se nade o kome je rijec i uzme mu se mail i onda se tom posalje
-            $mail_from = "qick319@gmail.com";
+            $mail_to = $email;
+            $mail_from = "azivko@student.foi.hr";
             $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
             $mail_body = "Kod za aktivaciju racuna je: {$kod_rand}";
 
@@ -115,7 +120,7 @@ if (!isset($_SESSION["uloga"])) {
         $rezultat = $veza->selectDB($upit);
 
         $mail_to = 'andrijazifko@gmail.com';    //trenutno se salje ovom mailu, ako budem htel drugi mail onda SELECT u bazu $_GET["username"] da se nade o kome je rijec i uzme mu se mail i onda se tom posalje
-        $mail_from = "qick319@gmail.com";
+        $mail_from = "azivko@student.foi.hr";
         $mail_subject = '[WebDiP] Slanje maila: Aktivacija računa';
         $mail_body = "Kod za aktivaciju racuna je: {$kod_rand}";
 
